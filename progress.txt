@@ -1,0 +1,42 @@
+10-20 ESM Project sketch
+
+Main factors to measure:
+	
+	1. Time period (Let's say 20 days, 10 days, 5 days, 1 day).
+	2. LOC changed (modified, added, deleted)
+.	3.1. Single developer or multiple developers have modified the file.
+	3.2. Total number of developers who have modified the file during the given period of time.
+
+Task: Write a proposal (1-2p.) containing all the information, main purpose and the outcomes of the research.
+
+
+
+11-06
+
+PLAN for the project:
+
+	1.	Clone repository locally;
+	2.	Get log from the repository;
+	3.	Parse commits to suitable format (CommitBean vector in this case);
+	4.	Mine issues from issue tracker (Jira in this case);
+		4.1.	Mining only "BUG" issues;
+	5.	Get commits which fixed bugs;
+	6.	Git diff on bug-fixed commits;
+		6.1. Data needed:
+
+			commit id
+			date of commit
+			author
+			modified file names
+			modified lines list
+			modified lines numbers inside file
+	7.	Git blame on every file of bug-fixed commits;
+	8.	Extract the history of every modified line;
+	9.	
+
+-------------Q------------
+How to deal with newly added files on commit which introduced a bug?
+
+
+----------@TODO
+Check for lines of whose only positions were changed (identic removed and added line)

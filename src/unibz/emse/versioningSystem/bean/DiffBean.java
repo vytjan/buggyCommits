@@ -8,9 +8,11 @@ public class DiffBean {
 	private String authorEmail;
 	private String modifiedFile;
 	private Date date;
-	private Vector<String> modifiedLines;
-//	private Vector<String> addedLines;
-//	private Vector<String> deletedLines;
+//	private Vector<String> modifiedLines;
+	private Vector<String> addedLines;
+	private Vector<String> removedLines;
+	private String addedNumber;
+	private String removedNumber;
 //	private Vector<String> blame;
 	
 	public String getFile() {
@@ -26,30 +28,44 @@ public class DiffBean {
 	public void setAuthor(String author) {
 		this.authorEmail = author;
 	}
-	public Vector<String> getModifiedLines() {
-		return modifiedLines;
+	
+	public Vector<String> getAddedLines() {
+		return addedLines;
 	}
-	public void setModifiedLines(Vector<String> modLines) {
-		this.modifiedLines = modLines;
+	
+	public void setAddedLines(Vector<String> addedLines) {
+		this.addedLines = addedLines;
 	}
-//	public Vector<String> getAddedLines() {
-//		return addedFiles;
-//	}
-//	public void setAddedFiles(Vector<String> addedFiles) {
-//		this.addedFiles = addedFiles;
-//	}
-//	public Vector<String> getDeletedFiles() {
-//		return deletedFiles;
-//	}
-//	public void setDeletedFiles(Vector<String> deletedFiles) {
-//		this.deletedFiles = deletedFiles;
-//	}
+
+	public Vector<String> getRemovedLines() {
+		return removedLines;
+	}
+	public void setRemovedLines(Vector<String> removedLines) {
+		this.removedLines = removedLines;
+	}
 	public String getCommitId() {
 		return commitId;
 	}
 	public void setCommitId(String commitId) {
 		this.commitId = commitId;
 	}
+	
+	public String getAddedNumber() {
+		return addedNumber;
+	}
+	
+	public void setAddedNumber(String addedNumber) {
+		this.addedNumber = commitId;
+	}
+	
+	public String getRemovedNumber() {
+		return removedNumber;
+	}
+	
+	public void setRemovedNumber(String removedNumber) {
+		this.removedNumber = removedNumber;
+	}
+	
 	public Date getDate() {
 		return date;
 	}

@@ -22,6 +22,8 @@ public class JiraMining {
 			Vector<IssueBean> jiraIssues = Jira.getIssuesFromJiraIssueTracker(jiraAddress, projectName, type, status, resolution, dateStart, dateEnd);
 			Vector<IssueBean> tempJiraIssues = new Vector<IssueBean>();
 			Date lastCommit;
+			
+			/*parse all the issues from the project*/
 			while(jiraIssues.size() == 100){
 				lastCommit = jiraIssues.lastElement().getCreated();
 				Date today = new Date();

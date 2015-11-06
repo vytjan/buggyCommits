@@ -28,7 +28,6 @@ public class Test {
 		try {
 			//GitUtilities.cloneGitRepositoryUnix("https://github.com/apache/commons-io.git", 
 			//		"/home/vytautas/Desktop", "/usr/bin/git", "/home/vytautas/Desktop/");
-			
 			GitUtilities.getLogFromGitRepository("/home/vytautas/Desktop/commons-io", "/usr/bin/git", "/home/vytautas/Desktop/commons-io/log.txt", "/home/vytautas/Desktop/");
 			
 			Vector<CommitBean> commits = GitUtilities.readCommits("/home/vytautas/Desktop/commons-io/log.txt");
@@ -37,12 +36,14 @@ public class Test {
 //			}
 			//System.out.println(commits.size() + " is size of commits vector");
 			
+			/*Mine all the single project issues from Jira*/
 			Vector<IssueBean> collectToReturn = JiraMining.mineIssues("https://issues.apache.org/jira/", "IO", "BUG", "RESOLVED", null, null, null);
 			
 			//collect commits which fixed bugs
 			Vector<CommitBean> bugFixCommits = new Vector<CommitBean>();
 			
 			for(IssueBean parseIssue:collectToReturn){
+				
 				String numberOfIssue = parseIssue.getIssueId();
 				//issue id pattern
 				String issueId = Pattern.quote(numberOfIssue);
@@ -62,14 +63,21 @@ public class Test {
 			
 			System.out.println(bugFixCommits.size() + " is a size of bugfixed commits vector");
 			
-			//blaming files:
+			//git diff on every file of commit:
 			for(CommitBean singleBugFix:bugFixCommits){
 				String singleCommitId = singleBugFix.getCommitId();
-				System.out.println(singleBugFix.getCommitId());
+				String singleCommitAuthor = singleBugFix.getAuthor();
+				Date singleCommitDate = singleBugFix.getDate();
+				//System.out.println(singleBugFix.getCommitId());
+				
+				//Get diff for every commit
 				GitSzz.getDiff("/home/vytautas/Desktop/commons-io", "/usr/bin/git", "/home/vytautas/Desktop/commons-io/diff.txt", "/home/vytautas/Desktop/", singleCommitId);
-				Vector<DiffBean> diffVector = GitSzz.readDiffs("/home/vytautas/Desktop/commons-io/diff.txt");
-				System.out.println(diffVector.size());
-//				Vector<String> modFilesInCommit = singleBugFix.getModifiedFiles();
+				
+				//Parse every diff command from diff.txt file
+				Vector<DiffBean> diffVector = GitSzz.readDiff("/home/vytautas/Desktop/commons-io/diff.txt", singleCommitId, singleCommitAuthor, singleCommitDate);
+				
+				System.out.println(diffVector.size() + " is a size of diffVector");
+				//checkout to needed 
 //				for(String singleModFile:modFilesInCommit){
 //					System.out.println(singleModFile);
 				//	GitUtilities.getBlameHistory("/home/vytautas/Desktop/commons-io", "/usr/bin/git", "/home/vytautas/Desktop/commons-io/blame.txt", "/home/vytautas/Desktop/", singleModFile);
