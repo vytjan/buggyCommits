@@ -46,8 +46,8 @@ public class DiffBean {
 	public String getCommitId() {
 		return commitId;
 	}
-	public void setCommitId(String commitId) {
-		this.commitId = commitId;
+	public void setCommitId(String inCommitId) {
+		this.commitId = inCommitId;
 	}
 	
 	public String getAddedNumber() {

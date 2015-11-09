@@ -14,6 +14,7 @@ import java.util.regex.Pattern;
 
 import unibz.emse.versioningSystem.bean.CommitBean;
 import unibz.emse.versioningSystem.bean.DiffBean;
+import unibz.emse.versioningSystem.git.GitDiff;
 import unibz.emse.versioningSystem.git.GitSzz;
 import unibz.emse.versioningSystem.git.GitUtilities;
 import unibz.emse.issueTracker.IssueMining.*;
@@ -23,7 +24,9 @@ import unibz.emse.issueTracker.miner.Jira;
 public class Test {
 
 	public static void main(String[] args) throws Exception {
-		
+		//if "checkout to HEAD branch"
+		Boolean noReverse = false;
+		Boolean reverse = true;
 		
 		try {
 			//GitUtilities.cloneGitRepositoryUnix("https://github.com/apache/commons-io.git", 
@@ -69,14 +72,29 @@ public class Test {
 				String singleCommitAuthor = singleBugFix.getAuthor();
 				Date singleCommitDate = singleBugFix.getDate();
 				//System.out.println(singleBugFix.getCommitId());
-				
+				System.out.println(singleCommitId);
 				//Get diff for every commit
 				GitSzz.getDiff("/home/vytautas/Desktop/commons-io", "/usr/bin/git", "/home/vytautas/Desktop/commons-io/diff.txt", "/home/vytautas/Desktop/", singleCommitId);
 				
 				//Parse every diff command from diff.txt file
-				Vector<DiffBean> diffVector = GitSzz.readDiff("/home/vytautas/Desktop/commons-io/diff.txt", singleCommitId, singleCommitAuthor, singleCommitDate);
+				Vector<DiffBean> diffVector = GitDiff.readDiff("/home/vytautas/Desktop/commons-io/diff.txt", singleCommitId, singleCommitAuthor, singleCommitDate);
 				
 				System.out.println(diffVector.size() + " is a size of diffVector");
+				
+				//checkout to every different commit version
+				GitSzz.checkoutCommit("/home/vytautas/Desktop/commons-io", "/usr/bin/git", "/home/vytautas/Desktop/", singleCommitId, noReverse);
+				for(DiffBean singleDiff:diffVector) {
+					String fileNameToBlame = singleDiff.getFile();
+					
+					//blame every file in checkout'ed commit:
+				//	GitSzz.getBlameHistory("/home/vytautas/Desktop/commons-io", "/usr/bin/git", "/home/vytautas/Desktop/commons-io/blame.txt", "/home/vytautas/Desktop/", fileNameToBlame);
+				}
+				//go to the latest commit again
+				GitSzz.checkoutCommit("/home/vytautas/Desktop/commons-io", "/usr/bin/git", "/home/vytautas/Desktop/", null, reverse);
+				
+				
+				
+				
 				//checkout to needed 
 //				for(String singleModFile:modFilesInCommit){
 //					System.out.println(singleModFile);
