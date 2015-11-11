@@ -25,17 +25,24 @@ PLAN for the project:
 		6.1. Data needed:
 
 			commit id
-			date of commit
-			author
-			modified file names
-			modified lines list
 			modified lines numbers inside file
-	7.	Git blame on every file of bug-fixed commits;
-	8.	Extract the history of every modified line;
-	9.	
+			@TODO remove test files!!
+	7. Checkout to every commit which fixed bugs
+	8.	Git blame on every file of bug-fixed commits:
+		8.1. check every modified line one by one to see if there was one/more commits which modified those lines;
+		8.2. Data needed:
+			commit author
+			date of commit
+			commit id
+		@TODO
+	9.	Extract the history of every modified line;
+	10.	
+
+
 
 -------------Q------------
 How to deal with newly added files on commit which introduced a bug?
+Ignore them.
 
 
 ----------@TODO

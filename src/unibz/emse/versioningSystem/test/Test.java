@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 
 import unibz.emse.versioningSystem.bean.CommitBean;
 import unibz.emse.versioningSystem.bean.DiffBean;
-import unibz.emse.versioningSystem.git.GitDiff;
+import unibz.emse.versioningSystem.git.GitRead;
 import unibz.emse.versioningSystem.git.GitSzz;
 import unibz.emse.versioningSystem.git.GitUtilities;
 import unibz.emse.issueTracker.IssueMining.*;
@@ -24,11 +24,12 @@ import unibz.emse.issueTracker.miner.Jira;
 public class Test {
 
 	public static void main(String[] args) throws Exception {
-		//if "checkout to HEAD branch"
+		
 		Boolean noReverse = false;
 		Boolean reverse = true;
 		
 		try {
+			
 			//GitUtilities.cloneGitRepositoryUnix("https://github.com/apache/commons-io.git", 
 			//		"/home/vytautas/Desktop", "/usr/bin/git", "/home/vytautas/Desktop/");
 			GitUtilities.getLogFromGitRepository("/home/vytautas/Desktop/commons-io", "/usr/bin/git", "/home/vytautas/Desktop/commons-io/log.txt", "/home/vytautas/Desktop/");
@@ -64,7 +65,10 @@ public class Test {
 				}
 			}
 			
-			System.out.println(bugFixCommits.size() + " is a size of bugfixed commits vector");
+			//System.out.println(bugFixCommits.size() + " is a size of bugfixed commits vector");
+			
+			//if "checkout to HEAD branch"
+			//GitSzz.checkoutCommit("/home/vytautas/Desktop/commons-io", "/usr/bin/git", "/home/vytautas/Desktop/", null, reverse);
 			
 			//git diff on every file of commit:
 			for(CommitBean singleBugFix:bugFixCommits){
@@ -77,20 +81,35 @@ public class Test {
 				GitSzz.getDiff("/home/vytautas/Desktop/commons-io", "/usr/bin/git", "/home/vytautas/Desktop/commons-io/diff.txt", "/home/vytautas/Desktop/", singleCommitId);
 				
 				//Parse every diff command from diff.txt file
-				Vector<DiffBean> diffVector = GitDiff.readDiff("/home/vytautas/Desktop/commons-io/diff.txt", singleCommitId, singleCommitAuthor, singleCommitDate);
+				Vector<DiffBean> diffVector = GitRead.readDiff("/home/vytautas/Desktop/commons-io/diff.txt", singleCommitId, singleCommitAuthor, singleCommitDate);
 				
-				System.out.println(diffVector.size() + " is a size of diffVector");
+				//System.out.println(diffVector.size() + " is a size of diffVector");
 				
 				//checkout to every different commit version
 				GitSzz.checkoutCommit("/home/vytautas/Desktop/commons-io", "/usr/bin/git", "/home/vytautas/Desktop/", singleCommitId, noReverse);
+				
+				//get the blame history of every file in checkouted commit
 				for(DiffBean singleDiff:diffVector) {
 					String fileNameToBlame = singleDiff.getFile();
+					//System.out.println(fileNameToBlame);
+//					System.out.println(singleDiff.getRemovedNumber());
 					
+					//if(singleDiff.get)
+					//System.out.println(singleDiff.getAddedNumber());
+					//System.out.println(singleDiff.getRemovedNumber());
+//					if(singleDiff.getRemovedLines().size() > 0 ){
+//						for(String rLine:singleDiff.getRemovedLines()){
+//								System.out.println(rLine);
+//						}
+//					}
 					//blame every file in checkout'ed commit:
-				//	GitSzz.getBlameHistory("/home/vytautas/Desktop/commons-io", "/usr/bin/git", "/home/vytautas/Desktop/commons-io/blame.txt", "/home/vytautas/Desktop/", fileNameToBlame);
+					GitSzz.getBlameHistory("/home/vytautas/Desktop/commons-io", "/usr/bin/git", "/home/vytautas/Desktop/commons-io/blame.txt", "/home/vytautas/Desktop/", fileNameToBlame);
+					//GitRead.readBlame("/home/vytautas/Desktop/commons-io/blame.txt");
+					//get the author of every modified file LOC
+					
 				}
 				//go to the latest commit again
-				GitSzz.checkoutCommit("/home/vytautas/Desktop/commons-io", "/usr/bin/git", "/home/vytautas/Desktop/", null, reverse);
+				//GitSzz.checkoutCommit("/home/vytautas/Desktop/commons-io", "/usr/bin/git", "/home/vytautas/Desktop/", null, reverse);
 				
 				
 				

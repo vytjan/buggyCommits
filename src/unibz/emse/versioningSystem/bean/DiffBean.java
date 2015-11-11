@@ -8,9 +8,9 @@ public class DiffBean {
 	private String authorEmail;
 	private String modifiedFile;
 	private Date date;
+	private String removedQuantity;
 //	private Vector<String> modifiedLines;
-	private Vector<String> addedLines;
-	private Vector<String> removedLines;
+	private Vector<Integer> removedLines;
 	private String addedNumber;
 	private String removedNumber;
 //	private Vector<String> blame;
@@ -28,21 +28,21 @@ public class DiffBean {
 	public void setAuthor(String author) {
 		this.authorEmail = author;
 	}
-	
-	public Vector<String> getAddedLines() {
-		return addedLines;
-	}
-	
-	public void setAddedLines(Vector<String> addedLines) {
-		this.addedLines = addedLines;
-	}
 
-	public Vector<String> getRemovedLines() {
+	public Vector<Integer> getRemovedLines() {
 		return removedLines;
 	}
-	public void setRemovedLines(Vector<String> removedLines) {
+	public void setRemovedLines(Vector<Integer> removedLines) {
 		this.removedLines = removedLines;
 	}
+
+	public String getRemovedQuantity() {
+		return removedQuantity;
+	}
+	public void setRemovedQuantity(String removedQuantity) {
+		this.removedQuantity = removedQuantity;
+	}
+	
 	public String getCommitId() {
 		return commitId;
 	}
