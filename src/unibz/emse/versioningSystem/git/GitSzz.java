@@ -30,7 +30,7 @@ public class GitSzz {
 	 * @throws InterruptedException
 	 */
 	
-	public static String mainBranch;
+	public static String mainBranch = "trunk";
 	public static void getBlameHistory(String repositoryLocalPath,
 			String gitCommand, String outputPath, String tmpFolder, String fileNameToBlame) throws IOException, InterruptedException {
 			//[START] Create a temporary file where we write the commands
@@ -229,5 +229,68 @@ public class GitSzz {
 				process.destroy();
 	}
 	
+	
+	public static void restore(String repositoryLocalPath,
+			String gitCommand, String tmpFolder) throws IOException, InterruptedException {
+			//[START] Create a temporary file where we write the commands
+				//that we want to execute from command line
+				File commandsToExecute = new File(tmpFolder + "/commands.sh");
+				commandsToExecute.createNewFile();
+				//[END]
+				
+				//[START] We print the command that we want to execute
+				PrintWriter pw = new PrintWriter(commandsToExecute);
+				pw.println("cd " + repositoryLocalPath);
+				pw.println(gitCommand + " checkout " + mainBranch);
+				
+				pw.close();
+				//[END]
+				
+				
+				//[START] Make the file executable (i.e., adds execution
+				//permissions to the created file)
+				Runtime rt = Runtime.getRuntime();
+				String cmd = "chmod u+x " + tmpFolder + "/commands.sh";
+				Process process = rt.exec(cmd);
+
+				String line = null;
+
+				BufferedReader stdoutReader = new BufferedReader(new InputStreamReader(
+						process.getInputStream()));
+				while ((line = stdoutReader.readLine()) != null) {
+					System.out.println(line);
+				}
+
+				BufferedReader stderrReader = new BufferedReader(new InputStreamReader(
+						process.getErrorStream()));
+				while ((line = stderrReader.readLine()) != null) {
+					System.out.println(line);
+				}
+
+				process.waitFor();
+				//[END]
+
+				//[START] Execute the command that we stored
+				//in commands.sh (i.e., in this case, checkout to needed commit version)
+				cmd = tmpFolder + "./commands.sh";
+				process = rt.exec(cmd);
+
+				line = null;
+
+				stdoutReader = new BufferedReader(new InputStreamReader(
+						process.getInputStream()));
+				while ((line = stdoutReader.readLine()) != null) {
+					System.out.println(line);
+				}
+
+				stderrReader = new BufferedReader(new InputStreamReader(
+						process.getErrorStream()));
+				while ((line = stderrReader.readLine()) != null) {
+					System.out.println(line);
+				}
+
+				process.waitFor();
+				process.destroy();
+	}
 	
 }

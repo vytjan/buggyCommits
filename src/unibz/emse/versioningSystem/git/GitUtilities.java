@@ -277,9 +277,18 @@ public class GitUtilities {
 						result.addElement(singleCommit);
 						singleCommit = new CommitBean();
 					}
-					//count+=1;
+
 					if(matcherAuthorEmail.find()) {
-						singleCommit.setAuthor(matcherAuthorEmail.group(1));
+						String correct = Pattern.compile("(.*?)") + Pattern.quote(" ") + Pattern.compile("(.*?)");
+						Pattern patternCorrected = Pattern.compile(correct);
+						Matcher matcherCorrect = patternCorrected.matcher(matcherAuthorEmail.group(1));
+						if(matcherCorrect.find()){
+							singleCommit.setAuthor(matcherCorrect.group(1));
+						} else if(matcherAuthorEmail.group(1).equals("dev-null@apache.org")){
+							continue;
+						} else {
+							singleCommit.setAuthor(matcherAuthorEmail.group(1));
+						}
 					} if(matcherCommitId.find()) {
 						singleCommit.setCommitId(matcherCommitId.group(1));
 					}  if(matcherCommitDate.find()) {

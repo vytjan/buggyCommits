@@ -27,6 +27,7 @@ PLAN for the project:
 			commit id
 			modified lines numbers inside file
 			@TODO remove test files!!
+				Check for comments;
 	7. Checkout to every commit which fixed bugs
 	8.	Git blame on every file of bug-fixed commits:
 		8.1. check every modified line one by one to see if there was one/more commits which modified those lines;
@@ -47,3 +48,9 @@ Ignore them.
 
 ----------@TODO
 Check for lines of whose only positions were changed (identic removed and added line)
+
+
+Presentation:
+	Clear introduction on the goal, description and current status;
+	near future plans (1 month);
+	20 mins

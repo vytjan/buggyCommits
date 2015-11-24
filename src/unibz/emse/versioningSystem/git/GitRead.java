@@ -2,15 +2,19 @@ package unibz.emse.versioningSystem.git;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.ParseException;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import unibz.emse.versioningSystem.bean.BlameBean;
+import unibz.emse.versioningSystem.bean.CommitBean;
+import unibz.emse.versioningSystem.bean.DevBean;
 import unibz.emse.versioningSystem.bean.DiffBean;
 
 public class GitRead {
@@ -78,7 +82,7 @@ public class GitRead {
 				String removedQuantity = matcherLineNumbers.group(2);
 				//singleDiffBean.setRemovedNumber(removedNumber);
 				lineNumber = Integer.parseInt(removedNumber);
-				System.out.println(removedNumber + "," + removedQuantity);
+				//System.out.println(removedNumber + "," + removedQuantity);
 				lineNumber = lineNumber -1;
 			}
 
@@ -203,5 +207,53 @@ public class GitRead {
 		br.close();
 
 		return resultBlame;
+	}
+
+	
+	public static Vector<DevBean> getDevs(Vector<CommitBean> commits){
+		
+		HashSet<String> developers = new HashSet<String>();
+		Vector<DevBean> devs = new Vector<DevBean>();
+		for(CommitBean commit:commits){
+			developers.add(commit.getAuthor());
+		}
+		
+		//set email of the dev on DevBean
+		for(String dev:developers){
+			DevBean singleDev = new DevBean();
+			
+			singleDev.setDev(dev);
+			devs.add(singleDev);
+		}
+		
+		//put commits of a developer to DevBean
+		for(DevBean singleDev:devs){
+			Vector<CommitBean> commitsVector = new Vector<CommitBean>();
+			for(CommitBean commit:commits){
+				if(commit.getAuthor().equals(singleDev.getDev())){
+					commitsVector.add(commit);
+				}
+			}
+			singleDev.setCommits(commitsVector);
+		}
+		
+		return devs;
+	}
+	
+	public Vector<DevBean> findFiles(Vector<DevBean> origin) {
+		Vector<DevBean> modified = new Vector<DevBean>();
+		
+		//
+		for(DevBean singleDev:origin){
+			for(CommitBean singleCommitBean:singleDev.getCommits()){
+				for(String singleFileName:singleCommitBean.getModifiedFiles()){
+					
+				}
+				String toCompare = singleCommitBean.getCommitId();
+				
+			}
+		}
+		
+		return modified;
 	}
 }
