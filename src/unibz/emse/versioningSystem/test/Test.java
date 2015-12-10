@@ -1,5 +1,6 @@
 package unibz.emse.versioningSystem.test;
 
+import java.awt.List;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -39,16 +40,16 @@ public class Test {
 			
 			//get full log of commits
 			Vector<CommitBean> commits = GitUtilities.readCommits(logFilePath);
+			
 			//get full list of developers
 			Vector<DevBean> devList = GitRead.getDevs(commits);
 			
-			//print the list of developers
-			for(DevBean dev:devList){
-				System.out.println(dev.getCommits().size());
-				
-				
-				
-			}
+			//filter Commits only to those containing same file names:
+			Vector<DevBean> filtered = GitRead.findFiles(devList);
+			
+			
+			
+			
 			
 //			for(CommitBean commit:commits){
 //				System.out.println(commit.getCommitMessage());

@@ -90,7 +90,7 @@ public class GitRead {
 			if(strLine.startsWith("- ")){
 				int removedLine = lineNumber;					
 				removedLines.add(removedLine);
-				System.out.println(removedLine + " is a removed line number");				
+//				System.out.println(removedLine + " is a removed line number");				
 			}
 			
 			if(strLine.startsWith("+ ")){
@@ -232,6 +232,7 @@ public class GitRead {
 			for(CommitBean commit:commits){
 				if(commit.getAuthor().equals(singleDev.getDev())){
 					commitsVector.add(commit);
+//					System.out.println(commit.getCommitId());
 				}
 			}
 			singleDev.setCommits(commitsVector);
@@ -240,18 +241,52 @@ public class GitRead {
 		return devs;
 	}
 	
-	public Vector<DevBean> findFiles(Vector<DevBean> origin) {
+	public static Vector<DevBean> findFiles(Vector<DevBean> origin) throws IOException, InterruptedException, ParseException {
 		Vector<DevBean> modified = new Vector<DevBean>();
 		
-		//
-		for(DevBean singleDev:origin){
-			for(CommitBean singleCommitBean:singleDev.getCommits()){
-				for(String singleFileName:singleCommitBean.getModifiedFiles()){
-					
-				}
-				String toCompare = singleCommitBean.getCommitId();
+		//check if a test file:
+		String regexTestFile = Pattern.compile("(.*?)") + Pattern.quote("Test") + Pattern.compile("(.*?)");
+		Pattern patternTestFile = Pattern.compile(regexTestFile);
+		
+		
+		//print the list of developers
+		int num = 0;
+		for(DevBean dev:origin){
+//			System.out.println(dev.getCommits().size());
+			
+			//remove commits not containing 
+			for(int i = 0; i<dev.getCommits().size(); i++){
 				
+				CommitBean commitBefore = dev.getCommits().get(i);
+				
+				for(int j = i+1; j < dev.getCommits().size(); j++){
+					
+					CommitBean commitAfter = dev.getCommits().get(j);
+										
+					if(commitBefore.getModifiedFiles() != null && commitBefore.getModifiedFiles().size() > 0){
+						for(String comBefore:commitBefore.getModifiedFiles()){
+							if(commitAfter.getModifiedFiles() != null && commitAfter.getModifiedFiles().size() > 0){
+								for(String comAfter:commitAfter.getModifiedFiles()){
+									Matcher matcherTestFile = patternTestFile.matcher(comBefore);
+									if(comBefore.equals(comAfter) && !comBefore.endsWith(".txt") && !comBefore.endsWith(".xml") && !matcherTestFile.find()){
+										//System.out.println(comBefore + " " + comAfter);
+										//git diff
+										
+//										GitSzz.getDiff("/home/vytautas/Desktop/commons-io", "/usr/bin/git", "/home/vytautas/Desktop/commons-io/diff.txt", "/home/vytautas/Desktop/", commitBefore.getCommitId(), commitAfter.getCommitId(), comAfter);
+//										Vector<DiffBean> diffVector = GitRead.readDiff("/home/vytautas/Desktop/commons-io/diff.txt", commitAfter.getCommitId(), commitAfter.getAuthor(), commitAfter.getDate());
+//										for(DiffBean singleDiff:diffVector){
+										//	System.out.println(singleDiff.getRemovedQuantity());
+//										}
+										num++;
+										System.out.println(num);
+									}
+								}	
+							}
+						}	
+					}
+				}	
 			}
+//			break;
 		}
 		
 		return modified;

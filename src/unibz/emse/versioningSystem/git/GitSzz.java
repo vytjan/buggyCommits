@@ -97,7 +97,7 @@ public class GitSzz {
 	}
 	
 	public static void getDiff(String repositoryLocalPath,
-			String gitCommand, String outputPath, String tmpFolder, String commitId) throws IOException, InterruptedException {
+			String gitCommand, String outputPath, String tmpFolder, String commitBefore, String commitAfter, String fileName) throws IOException, InterruptedException {
 			//[START] Create a temporary file where we write the commands
 				//that we want to execute from command line
 				File commandsToExecute = new File(tmpFolder + "/commands.sh");
@@ -108,7 +108,7 @@ public class GitSzz {
 				PrintWriter pw = new PrintWriter(commandsToExecute);
 				pw.println("cd " + repositoryLocalPath);
 				pw.println(gitCommand + " name-rev --name-only HEAD" + " > " + mainBranch);
-				pw.println(gitCommand + " diff " + commitId + "^ " + commitId + " > " + outputPath);
+				pw.println(gitCommand + " diff " + commitBefore + " " + commitAfter + " -- " + fileName + " > " + outputPath);
 				pw.close();
 				//[END]
 				

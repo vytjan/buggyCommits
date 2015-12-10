@@ -48,9 +48,18 @@ Ignore them.
 
 ----------@TODO
 Check for lines of whose only positions were changed (identic removed and added line)
+Not include test files and .txt etc. - which not affect bugs in code
 
 
 Presentation:
 	Clear introduction on the goal, description and current status;
 	near future plans (1 month);
 	20 mins
+
+---------------------------------------
+
+12-08
+QQQ How to count number of modified lines:
+	|sum of (+++) lines - sum of (---) lines| ?
+QQQ Do I need to count if the line was modified by a different author, or just a file was modified by the same/different author?
+QQQ
