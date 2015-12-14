@@ -173,7 +173,7 @@ readFile:	while ((strLine = br.readLine()) != null)   {
 		Pattern patternLineNumbers = Pattern.compile(regexLineNumbers);
 		
 		//name of file modified:
-		String regexName = Pattern.quote("diff --git a/") + Pattern.compile("(.*?)") + Pattern.quote(" ") + Pattern.compile("(.*?)");
+		String regexName = Pattern.quote("diff --git a/") + Pattern.compile("(.*?)") + Pattern.quote(".java ") + Pattern.compile("(.*?)");
 		Pattern patternName = Pattern.compile(regexName);
 		
 		//check if not test file:
@@ -213,6 +213,9 @@ readFile:	while ((strLine = br.readLine()) != null)   {
 		
 		//Read File Line By Line
 		while ((strLine = br.readLine()) != null)   {
+//			if(removedLines.size() < 1){
+//				gotFile = false;
+//			}
 			Matcher matcherLineNumbers = patternLineNumbers.matcher(strLine);
 			Matcher matcherName = patternName.matcher(strLine);
 //			Matcher matcherLineRemoved = patternLineRemoved.matcher(strLine);
@@ -225,37 +228,41 @@ readFile:	while ((strLine = br.readLine()) != null)   {
 			Matcher matcherTest = patternTest.matcher(strLine);
 			Matcher matcherJava = patternJava.matcher(strLine);
 			
-			if(strLine.startsWith("diff --git") && singleDiffBean.getFile() != null && removedLines.size() > 0 ){
-				System.out.println("Found diff --git line");
-				//set id of commit to diffBean
-				singleDiffBean.setCommitId(commitId);
-				System.out.println(commitId);
-				singleDiffBean.setDate(commitDate);
-				singleDiffBean.setAuthor(author);
-				
-//				System.out.println("Removed lines are: " + removedLines );
-				System.out.println(singleDiffBean.getFile() + " to bean");
-				for(Integer singleLine:removedLines){
-					System.out.println(singleLine);
+			if(strLine.startsWith("diff --git") && singleDiffBean.getFile() != null){
+//				System.out.println("Found diff --git line");
+				if(removedLines.size() > 0 ){
+					//set id of commit to diffBean
+					singleDiffBean.setCommitId(commitId);
+//					System.out.println(commitId);
+//					System.out.println(singleDiffBean.getFile() + " is a fileName");
+					singleDiffBean.setDate(commitDate);
+					singleDiffBean.setAuthor(author);
+					
+	//				System.out.println("Removed lines are: " + removedLines );
+	//				System.out.println(singleDiffBean.getFile() + " to bean");
+//					for(Integer singleLine:removedLines){
+//						System.out.println(singleLine);
+//					}
+					singleDiffBean.setRemovedLines(removedLines);
+					resultDiff.addElement(singleDiffBean);
 				}
-				singleDiffBean.setRemovedLines(removedLines);
-				resultDiff.addElement(singleDiffBean);
+				removedLines = new Vector<Integer>();
 				gotFile = false;
 				singleDiffBean = new DiffBean();
 			}
 				
 				//match file name
-				if(matcherName.find() && matcherJava.find() && !matcherTest.find()) {
+				if(matcherName.find() && !matcherTest.find()) {
 					gotFile = true;
-					String fileName = matcherName.group(1);
+					String fileName = matcherName.group(1) + ".java";
 					singleDiffBean.setFile(fileName);
-					System.out.println(fileName + " found on diff");
+//					System.out.println(fileName + " found on diff");
 				}
 					
 				if(matcherLineNumbers.find() && gotFile){
 					String removedNumber = matcherLineNumbers.group(1);
 					String removedQuantity = matcherLineNumbers.group(2);
-					//singleDiffBean.setRemovedNumber(removedNumber);
+					singleDiffBean.setRemovedQuantity(removedQuantity);
 					lineNumber = Integer.parseInt(removedNumber);
 					//System.out.println(removedNumber + "," + removedQuantity);
 					lineNumber = lineNumber -1;
