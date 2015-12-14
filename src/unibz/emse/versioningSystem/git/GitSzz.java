@@ -173,7 +173,7 @@ public class GitSzz {
 				PrintWriter pw = new PrintWriter(commandsToExecute);
 				pw.println("cd " + repositoryLocalPath);
 				pw.println(gitCommand + " name-rev --name-only HEAD" + " > " + mainBranch);
-				pw.println(gitCommand + " diff " + commitAfter + "^ " + commitAfter + " -- " + " > " + outputPath);
+				pw.println(gitCommand + " diff " + commitAfter + "^ " + commitAfter + " > " + outputPath);
 				pw.close();
 				//[END]
 				
