@@ -73,7 +73,7 @@ public class GitRead {
 readFile:	while ((strLine = br.readLine()) != null)   {
 			Matcher matcherLineNumbers = patternLineNumbers.matcher(strLine);
 			Matcher matcherName = patternName.matcher(strLine);
-			Matcher matcherLineRemoved = patternLineRemoved.matcher(strLine);
+//			Matcher matcherLineRemoved = patternLineRemoved.matcher(strLine);
 			Matcher matcherLineAdded = patternLineAdded.matcher(strLine);
 			Matcher matcherCommentStart = patternCommentStart.matcher(strLine);
 			Matcher matcherCommentEnd = patternCommentEnd.matcher(strLine);
@@ -82,24 +82,24 @@ readFile:	while ((strLine = br.readLine()) != null)   {
 			Matcher matcherCommentContinue2 = patternCommentContinue2.matcher(strLine);
 			
 			
-			//if it's a single line comment
-			if(matcherCommentLine.find()){
-//				System.out.println(strLine);
-				continue readFile;
-			}
-			//if line is a comment
-			if(matcherCommentStart.find()){
-//				System.out.println(strLine);
-				continue readFile;
-			}
-			if(matcherCommentContinue.find() || matcherCommentContinue2.find()){
-//				System.out.println(strLine);
-				continue readFile;
-			}
-			if(matcherCommentEnd.find()) {
-//				System.out.println(strLine);
-				continue readFile;
-			}
+//			//if it's a single line comment
+//			if(matcherCommentLine.find()){
+////				System.out.println(strLine);
+//				continue readFile;
+//			}
+//			//if line is a comment
+//			if(matcherCommentStart.find()){
+////				System.out.println(strLine);
+//				continue readFile;
+//			}
+//			if(matcherCommentContinue.find() || matcherCommentContinue2.find()){
+////				System.out.println(strLine);
+//				continue readFile;
+//			}
+//			if(matcherCommentEnd.find()) {
+////				System.out.println(strLine);
+//				continue readFile;
+//			}
 			
 //			System.out.println(strLine);
 				if(strLine.startsWith("diff --git")){
@@ -139,6 +139,142 @@ readFile:	while ((strLine = br.readLine()) != null)   {
 					int removedLine = lineNumber;					
 					removedLines.add(removedLine);
 //					System.out.println(removedLine + " is a removed line number");				
+				}
+				
+				if(strLine.startsWith("+ ")){
+					lineNumber--;
+				}
+					lineNumber++;
+		}
+		resultDiff.addElement(singleDiffBean);
+		//System.out.println(resultDiff.size() + " a size of resultDiff");
+		//Close the input stream
+		br.close();
+
+		return resultDiff;
+	}
+	
+	public static Vector<DiffBean> readDiffBuggy(String logFilePath, String commitId, String author, Date commitDate) throws IOException, ParseException{
+		Vector<DiffBean> resultDiff = new Vector<DiffBean>();
+		Vector<Integer> removedLines = new Vector<Integer>();
+		DiffBean singleDiffBean = new DiffBean();
+		
+		
+		//added lines
+		String regexLineAdded = Pattern.quote("+ ") + Pattern.compile("(.*?)");
+		Pattern patternLineAdded = Pattern.compile(regexLineAdded);
+		
+		//removed lines
+		String regexLineRemoved = Pattern.quote("- ") + Pattern.compile("(.*?)");
+		Pattern patternLineRemoved = Pattern.compile(regexLineRemoved);
+		
+		//number and position of lines removed:
+		String regexLineNumbers = Pattern.quote("@@ -") + Pattern.compile("(.*?)") + Pattern.quote(",") + Pattern.compile("(.*?)") +
+		Pattern.quote(" +") + Pattern.compile("(.*?)") + Pattern.quote(" @@");
+		Pattern patternLineNumbers = Pattern.compile(regexLineNumbers);
+		
+		//name of file modified:
+		String regexName = Pattern.quote("diff --git a/") + Pattern.compile("(.*?)") + Pattern.quote(" ") + Pattern.compile("(.*?)");
+		Pattern patternName = Pattern.compile(regexName);
+		
+		//if commented lines start
+//		String regexCommentStart = Pattern.compile("(.*?)") + Pattern.quote("/*") + Pattern.compile("(.*?)");
+//		Pattern patternCommentStart = Pattern.compile(regexCommentStart);
+//		
+//		String regexCommentEnd = Pattern.compile("(.*?)") + Pattern.quote("*/") + Pattern.compile("(.*?)");
+//		Pattern patternCommentEnd = Pattern.compile(regexCommentEnd);		
+//		
+		//Check if it's a single line comment
+//		String regexCommentLine = Pattern.compile("(.*?)") + Pattern.quote("/*") + Pattern.compile("(.*?)") + Pattern.quote("*/") + Pattern.compile("(.*?)");
+//		Pattern patternCommentLine = Pattern.compile(regexCommentLine);		
+//		
+//		//check if it's a * comment line
+//		String regexCommentContinue = Pattern.quote("-") + Pattern.compile("\\s+") + Pattern.quote("*") + Pattern.compile("(.*?)");
+//		Pattern patternCommentContinue = Pattern.compile(regexCommentContinue);
+//		
+//		String regexCommentContinue2 = Pattern.quote("+") + Pattern.compile("\\s+") + Pattern.quote("*") + Pattern.compile("(.*?)");
+//		Pattern patternCommentContinue2 = Pattern.compile(regexCommentContinue2);
+//		
+		// commented lines end
+		
+		FileInputStream fstream = new FileInputStream(logFilePath);
+		BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
+		
+		String strLine;
+		//line number count
+		int lineNumber = 0;
+		boolean startCount = false;
+		
+		//Read File Line By Line
+readFile:	while ((strLine = br.readLine()) != null)   {
+			Matcher matcherLineNumbers = patternLineNumbers.matcher(strLine);
+			Matcher matcherName = patternName.matcher(strLine);
+			Matcher matcherLineRemoved = patternLineRemoved.matcher(strLine);
+			Matcher matcherLineAdded = patternLineAdded.matcher(strLine);
+//			Matcher matcherCommentStart = patternCommentStart.matcher(strLine);
+//			Matcher matcherCommentEnd = patternCommentEnd.matcher(strLine);
+//			Matcher matcherCommentLine = patternCommentLine.matcher(strLine);
+//			Matcher matcherCommentContinue = patternCommentContinue.matcher(strLine);
+//			Matcher matcherCommentContinue2 = patternCommentContinue2.matcher(strLine);
+			
+			
+//			//if it's a single line comment
+//			if(matcherCommentLine.find()){
+////				System.out.println(strLine);
+//				continue readFile;
+//			}
+//			//if line is a comment
+//			if(matcherCommentStart.find()){
+////				System.out.println(strLine);
+//				continue readFile;
+//			}
+//			if(matcherCommentContinue.find() || matcherCommentContinue2.find()){
+////				System.out.println(strLine);
+//				continue readFile;
+//			}
+//			if(matcherCommentEnd.find()) {
+////				System.out.println(strLine);
+//				continue readFile;
+//			}
+			
+//			System.out.println(strLine);
+				if(strLine.startsWith("diff --git")){
+					
+					//set id of commit to diffBean
+					singleDiffBean.setCommitId(commitId);
+					singleDiffBean.setDate(commitDate);
+					
+					singleDiffBean.setAuthor(author);
+					if(singleDiffBean.getFile() != null){
+						if(removedLines.size() > 0){
+							System.out.println("Removed lines are: " + removedLines );
+							singleDiffBean.setRemovedLines(removedLines);
+						}
+						resultDiff.addElement(singleDiffBean);
+					}
+					singleDiffBean = new DiffBean();
+				}
+				
+				//match file name
+				if(matcherName.find()) {
+					String fileName = matcherName.group(1);
+					singleDiffBean.setFile(fileName);
+				}
+					
+				if(matcherLineNumbers.find()){
+					String removedNumber = matcherLineNumbers.group(1);
+					String removedQuantity = matcherLineNumbers.group(2);
+					//singleDiffBean.setRemovedNumber(removedNumber);
+					lineNumber = Integer.parseInt(removedNumber);
+					//System.out.println(removedNumber + "," + removedQuantity);
+					lineNumber = lineNumber -1;
+				}
+		
+				//collect numbers of removed lines
+				if(strLine.startsWith("- ")){
+					int removedLine = lineNumber;					
+					removedLines.add(removedLine);
+					System.out.println(removedLine + " is a removed line number");				
 				}
 				
 				if(strLine.startsWith("+ ")){
@@ -321,11 +457,11 @@ readFile:	while ((strLine = br.readLine()) != null)   {
 										//System.out.println(comBefore + " " + comAfter);
 										//git diff
 										
-										GitSzz.getDiff("/home/vytautas/Desktop/commons-io", "/usr/bin/git", "/home/vytautas/Desktop/commons-io/diff.txt", "/home/vytautas/Desktop/", commitBefore.getCommitId(), commitAfter.getCommitId(), comAfter);
-										Vector<DiffBean> diffVector = GitRead.readDiff("/home/vytautas/Desktop/commons-io/diff.txt", commitAfter.getCommitId(), commitAfter.getAuthor(), commitAfter.getDate());
-										for(DiffBean singleDiff:diffVector){
+//										GitSzz.getDiff("/home/vytautas/Desktop/commons-io", "/usr/bin/git", "/home/vytautas/Desktop/commons-io/diff.txt", "/home/vytautas/Desktop/", commitBefore.getCommitId(), commitAfter.getCommitId(), comAfter);
+//										Vector<DiffBean> diffVector = GitRead.readDiff("/home/vytautas/Desktop/commons-io/diff.txt", commitAfter.getCommitId(), commitAfter.getAuthor(), commitAfter.getDate());
+//										for(DiffBean singleDiff:diffVector){
 										//	System.out.println(singleDiff.getRemovedNumber());
-										}
+//										}
 										num++;
 										System.out.println(num);
 									}

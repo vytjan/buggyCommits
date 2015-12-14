@@ -63,3 +63,10 @@ QQQ How to count number of modified lines:
 	|sum of (+++) lines - sum of (---) lines| ?
 QQQ Do I need to count if the line was modified by a different author, or just a file was modified by the same/different author?
 QQQ
+
+
+
+@TODO 
+	Parse only java files as early as possible.
+	Exclude commented lines;
+	Divide git diff per file, because now to array are added modified lines from multiple files
