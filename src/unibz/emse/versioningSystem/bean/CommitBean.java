@@ -12,6 +12,7 @@ public class CommitBean {
 	private Vector<String> modifiedFiles;
 	private Vector<String> addedFiles;
 	private Vector<String> deletedFiles;
+	private boolean buggy;
 	
 	
 	public String getAuthor() {
@@ -55,5 +56,11 @@ public class CommitBean {
 	}
 	public void setDate(Date date) {
 		this.date = date;
+	}
+	public Boolean getBuggy() {
+		return buggy;
+	}
+	public void setBuggy(Boolean buggy) {
+		this.buggy = buggy;
 	}
 }

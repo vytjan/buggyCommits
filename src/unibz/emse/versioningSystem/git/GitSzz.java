@@ -228,7 +228,7 @@ public class GitSzz {
 	
 	
 	public static void checkoutCommit(String repositoryLocalPath,
-			String gitCommand, String tmpFolder, String commitId, Boolean reverse) throws IOException, InterruptedException {
+			String gitCommand, String tmpFolder, String commitId) throws IOException, InterruptedException {
 			//[START] Create a temporary file where we write the commands
 				//that we want to execute from command line
 				File commandsToExecute = new File(tmpFolder + "/commands.sh");
@@ -238,11 +238,7 @@ public class GitSzz {
 				//[START] We print the command that we want to execute
 				PrintWriter pw = new PrintWriter(commandsToExecute);
 				pw.println("cd " + repositoryLocalPath);
-				if(reverse){
-					pw.println(gitCommand + " checkout " + mainBranch);
-				} else {
-					pw.println(gitCommand + " checkout " + commitId);	
-				}
+				pw.println(gitCommand + " checkout " + commitId);	
 				
 				pw.close();
 				//[END]

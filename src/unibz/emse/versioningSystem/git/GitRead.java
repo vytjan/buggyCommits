@@ -218,13 +218,7 @@ readFile:	while ((strLine = br.readLine()) != null)   {
 //			}
 			Matcher matcherLineNumbers = patternLineNumbers.matcher(strLine);
 			Matcher matcherName = patternName.matcher(strLine);
-//			Matcher matcherLineRemoved = patternLineRemoved.matcher(strLine);
-//			Matcher matcherLineAdded = patternLineAdded.matcher(strLine);
-//			Matcher matcherCommentStart = patternCommentStart.matcher(strLine);
-//			Matcher matcherCommentEnd = patternCommentEnd.matcher(strLine);
-//			Matcher matcherCommentLine = patternCommentLine.matcher(strLine);
-//			Matcher matcherCommentContinue = patternCommentContinue.matcher(strLine);
-//			Matcher matcherCommentContinue2 = patternCommentContinue2.matcher(strLine);
+
 			Matcher matcherTest = patternTest.matcher(strLine);
 			Matcher matcherJava = patternJava.matcher(strLine);
 			
@@ -323,108 +317,66 @@ readFile:	while ((strLine = br.readLine()) != null)   {
 		return resultDiff;
 	}
 	
-	public static Vector<BlameBean> readBlame(String logFilePath) throws IOException, ParseException{
-		Vector<BlameBean> resultBlame = new Vector<BlameBean>();
-		Vector<String> modifiedLines = new Vector<String>();
-		BlameBean singleBlameBean = new BlameBean();
+	public static Vector<String> readBlame(String logFilePath, Vector<Integer> lineNumbers) throws IOException, ParseException{
+		HashSet<String> buggyCommit = new HashSet<String>();
+		Vector<String> bugs = new Vector<String>();
 		
-		//added lines
-		String regexLineAdded = Pattern.quote("+        ") + Pattern.compile("(.*?)");
-		Pattern patternLineAdded = Pattern.compile(regexLineAdded);
+		//if commented lines start
+		String regexCommentStart = Pattern.compile("\\s+(.*?)") + Pattern.quote("/*") + Pattern.compile("(.*?)");
+		Pattern patternCommentStart = Pattern.compile(regexCommentStart);
 		
-		//removed lines
-		String regexLineRemoved = Pattern.quote("-        ") + Pattern.compile("(.*?)");
-		Pattern patternLineRemoved = Pattern.compile(regexLineAdded);
+		String regexCommentEnd = Pattern.compile("(.*?)") + Pattern.quote("*/") + Pattern.compile("(.*?)");
+		Pattern patternCommentEnd = Pattern.compile(regexCommentEnd);		
 		
-		//number and position of lines added:
-		String regexAddedlines = Pattern.quote("@@ ") + Pattern.compile("(.*?)") + Pattern.quote(" ") + Pattern.compile("(.*?)") +
-		Pattern.quote(" @@");
-		Pattern patternAddedlines = Pattern.compile(regexAddedlines);
+		//Check if it's a single line comment
+		String regexCommentLine = Pattern.compile("\\s+(.*?)") + Pattern.quote("/*") + Pattern.compile("(.*?)") + Pattern.quote("*/") + Pattern.compile("(.*?)");
+		Pattern patternCommentLine = Pattern.compile(regexCommentLine);		
 		
-		//number and position of lines removed:
-		String regexRemlines = Pattern.quote("@@ ") + Pattern.compile("(.*?)") + Pattern.quote(" ") + Pattern.compile("(.*?)") +
-		Pattern.quote(" @@");
-		Pattern patternRemlines = Pattern.compile(regexRemlines);
+		//check if it's a * comment line
+		String regexCommentContinue = Pattern.compile("\\s+") + Pattern.quote("*") + Pattern.compile("(.*?)");
+		Pattern patternCommentContinue = Pattern.compile(regexCommentContinue);
 		
-		//name of file modified:
-		String regexName = Pattern.quote("diff --git a/") + Pattern.compile("(.*?)") + Pattern.quote(" ") + Pattern.compile("(.*?)");
-		Pattern patternName = Pattern.compile(regexName);
+		//check if empty line (whitespaces only)
+		Pattern patternEmpty = Pattern.compile("^\\s*$");
 		
 		FileInputStream fstream = new FileInputStream(logFilePath);
 		BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
 		
 		String strLine;
-		Vector<String> addedLines = new Vector<String>();
-		Vector<String> removedLines = new Vector<String>();
 		
 		//Read File Line By Line
 		while ((strLine = br.readLine()) != null)   {
-			if(strLine.startsWith("diff --git")){
-				//set id of commit to diffBean
-//				singleBlameBean.setCommitId(commitId);
-//				singleBlameBean.setDate(commitDate);
-//				
-//				singleBlameBean.setAuthor(author);
-				if(singleBlameBean.getName() != null){
-					if(addedLines.size() > 0){
-						//System.out.println(addedLines.size() + " is a size of added lines");
-						singleBlameBean.setAddedLines(addedLines);
+			for(Integer line:lineNumbers){
+				
+				//create matchers for comments
+				Matcher matcherCommentStart = patternCommentStart.matcher(strLine);
+				Matcher matcherCommentEnd = patternCommentEnd.matcher(strLine);
+				Matcher matcherCommentLine = patternCommentLine.matcher(strLine);
+				Matcher matcherCommentContinue = patternCommentContinue.matcher(strLine);
+				Matcher matcherEmpty = patternEmpty.matcher(strLine);
+				
+				String regexRemline = Pattern.compile("(.*?)") + Pattern.quote("") + Pattern.compile("\\s+") + Pattern.quote("(") + Pattern.compile("(.*?)") + Pattern.quote(line.toString()) +  Pattern.quote(")") + Pattern.compile("(.*?)");
+				Pattern patternRemLine = Pattern.compile(regexRemline);
+				
+				Matcher matcherRemLine = patternRemLine.matcher(strLine);
+				//match file name
+				if(matcherRemLine.find()) {
+					String codeLine = matcherRemLine.group(3);
+					//exclude commented lines:
+					if(!matcherCommentStart.find() && !matcherCommentEnd.find() && !matcherCommentLine.find() && !matcherCommentContinue.find() && !matcherEmpty.find()){
+//						System.out.println(strLine);
+						buggyCommit.add(matcherRemLine.group(1));
 					}
-					if(removedLines.size() > 0){
-						singleBlameBean.setRemovedLines(removedLines);
-						removedLines = new Vector<String>();
-					}
-					resultBlame.addElement(singleBlameBean);
 				}
-				singleBlameBean = new BlameBean();
-			}
-			
-			Matcher matcherLineAdded = patternLineAdded.matcher(strLine);
-			Matcher matcherAddedLines = patternAddedlines.matcher(strLine);
-			Matcher matcherRemLines = patternRemlines.matcher(strLine);
-			Matcher matcherName = patternName.matcher(strLine);
-			Matcher matcherLineRemoved = patternLineRemoved.matcher(strLine);
-			
-
-			//match file name
-			if(matcherName.find()) {
-				String fileName = matcherName.group(1);
-				singleBlameBean.setName(fileName);
-//				System.out.println(fileName);
-			}
-			
-			//match added lines number
-			if(matcherAddedLines.find()) {
-				String added = matcherAddedLines.group(1);
-//				System.out.println(added);
-				singleBlameBean.setAddedNumber(added);
-			}
-			
-			//match removed lines number
-			if(matcherRemLines.find()){
-				String removed = matcherRemLines.group(2);
-//				System.out.println(removed);
-				singleBlameBean.setRemovedNumber(removed);
-			}
-			
-			//collect added lines
-			if(matcherLineAdded.find()){
-				String addedLine = matcherLineAdded.group(1);
-				addedLines.add(addedLine);
-			}
-
-			//collect removed lines
-			if(matcherLineRemoved.find()){
-				String removedLine = matcherLineRemoved.group(1);
-				removedLines.add(removedLine);
 			}
 		}
-		resultBlame.addElement(singleBlameBean);
-		//System.out.println(resultDiff.size() + " a size of resultDiff");
 		//Close the input stream
 		br.close();
+		for(String set:buggyCommit){
+			bugs.add(set);
+		}
 
-		return resultBlame;
+		return bugs;
 	}
 
 	

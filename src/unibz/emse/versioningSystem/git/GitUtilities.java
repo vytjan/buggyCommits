@@ -290,6 +290,7 @@ public class GitUtilities {
 							singleCommit.setAuthor(matcherAuthorEmail.group(1));
 						}
 					} if(matcherCommitId.find()) {
+						singleCommit.setBuggy(false);
 						singleCommit.setCommitId(matcherCommitId.group(1));
 					}  if(matcherCommitDate.find()) {
 						DateFormat format = new SimpleDateFormat("yyyy-mm-dd HH:mm:ss Z", Locale.ENGLISH);

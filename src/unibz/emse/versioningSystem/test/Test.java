@@ -14,6 +14,7 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import unibz.emse.versioningSystem.bean.BlameBean;
 import unibz.emse.versioningSystem.bean.CommitBean;
 import unibz.emse.versioningSystem.bean.DevBean;
 import unibz.emse.versioningSystem.bean.DiffBean;
@@ -39,18 +40,6 @@ public class Test {
 			
 			//get full log of commits
 			Vector<CommitBean> commits = GitUtilities.readCommits(logFilePath);
-			
-			//get full list of developers
-//			Vector<DevBean> devList = GitRead.getDevs(commits);
-			
-			//filter Commits only to those containing same file names:
-//			Vector<DevBean> filtered = GitRead.findFiles(devList);
-			
-			
-//			for(CommitBean commit:commits){
-//				System.out.println(commit.getCommitMessage());
-//			}
-//			System.out.println(commits.size() + " is size of commits vector");
 			
 			/*Mine all the single project issues from Jira*/
 			Vector<IssueBean> collectToReturn = JiraMining.mineIssues("https://issues.apache.org/jira/", "IO", "BUG", "RESOLVED", null, null, null);
@@ -105,42 +94,72 @@ public class Test {
 				Vector<DiffBean> diffVector = GitRead.readDiffBuggy("/home/vytautas/Desktop/commons-io/diff.txt", singleCommitId, singleCommitAuthor, singleCommitDate);
 				for(DiffBean singleDiff: diffVector){
 //					System.out.println(singleDiff.getRemovedQuantity() + " is a quantity removed");
-					System.out.println(singleDiff.getFile() + " is a filename");
-						for(Integer singleNumber:singleDiff.getRemovedLines()){
-							System.out.println(singleNumber + " is a removed line");
-						}
+//					System.out.println(singleDiff.getFile() + " is a filename");
+//						for(Integer singleNumber:singleDiff.getRemovedLines()){
+//							System.out.println(singleNumber + " is a removed line");
+//						}
 //					System.out.println(singleDiff.getRemovedLines());
+					
 				}
 				//System.out.println(diffVector.size() + " is a size of diffVector");
 				
-				//checkout to every different commit version
-//				GitSzz.checkoutCommit("/home/vytautas/Desktop/commons-io", "/usr/bin/git", "/home/vytautas/Desktop/", singleCommitId, noReverse);
+				//checkout to every different commit version	
 				
 				//get the blame history of every file in checkouted commit
-//				for(DiffBean singleDiff:diffVector) {
-//					String fileNameToBlame = singleDiff.getFile();
-//					for(Integer singleNum:singleDiff.getRemovedLines()){
-//						
-//					}
-					//System.out.println(fileNameToBlame);
-//					System.out.println(singleDiff.getRemovedNumber());
+				for(DiffBean singleDiff:diffVector) {
+					String fileNameToBlame = singleDiff.getFile();
+					Vector<Integer> lineNumbers = singleDiff.getRemovedLines();
+					String singleComId = singleDiff.getCommitId();
+					GitSzz.checkoutCommit("/home/vytautas/Desktop/commons-io", "/usr/bin/git", "/home/vytautas/Desktop/", singleComId);
 					
-					//if(singleDiff.get)
-					//System.out.println(singleDiff.getAddedNumber());
-					//System.out.println(singleDiff.getRemovedNumber());
-//					if(singleDiff.getRemovedLines().size() > 0 ){
-//						for(String rLine:singleDiff.getRemovedLines()){
-//								System.out.println(rLine);
-//						}
-//					}
-					//blame every file in checkout'ed commit:
-//					GitSzz.getBlameHistory("/home/vytautas/Desktop/commons-io", "/usr/bin/git", "/home/vytautas/Desktop/commons-io/blame.txt", "/home/vytautas/Desktop/", fileNameToBlame);
-//					//GitRead.readBlame("/home/vytautas/Desktop/commons-io/blame.txt");
-//					//get the author of every modified file LOC
+					//git blame for every file to .txt
+					GitSzz.getBlameHistory("/home/vytautas/Desktop/commons-io", "/usr/bin/git", "/home/vytautas/Desktop/commons-io/blame.txt", "/home/vytautas/Desktop/", fileNameToBlame);
 //					
-//				}
-				//go to the latest commit again
-				//GitSzz.checkoutCommit("/home/vytautas/Desktop/commons-io", "/usr/bin/git", "/home/vytautas/Desktop/", null, reverse);
+					//parse git blame
+					Vector<String> blame = GitRead.readBlame("/home/vytautas/Desktop/commons-io/blame.txt", lineNumbers);
+//					for(String singleBlame:blame){
+//						System.out.println(singleBlame + " is a blame sssssssssssss");
+//					}
+					
+					//detect the most recent commit -> the one which introduced a bug
+					//need commits vector and hashset blame
+					CommitBean laterCommit;
+					CommitBean earlierCommit;
+					if(blame.size() > 0){
+						for(String primaryId:blame){
+							for(CommitBean comm:commits){
+								if(primaryId.substring(0, 7).equals(comm.getCommitId())){
+									laterCommit = comm;
+									for(String secondaryId:blame){
+										for(CommitBean comm2:commits){
+											if(comm2.getCommitId().equals(secondaryId.substring(0, 7)) && primaryId != secondaryId){
+												//compare 2 dates
+												earlierCommit = comm2;
+												if(laterCommit.getDate().compareTo(earlierCommit.getDate()) < 0){
+													laterCommit = earlierCommit;
+												}
+//												System.out.println(laterCommit.getDate() + "   " + earlierCommit.getDate());
+//												System.out.println();
+											}
+										}
+									}
+									laterCommit.setBuggy(true);
+//									System.out.println(laterCommit.getDate() + " is the most recent date");
+								}
+							}
+						}
+					}
+				}
+				
+				//get full list of developers
+//				Vector<DevBean> devList = GitRead.getDevs(commits);
+				
+				//filter Commits only to those containing same file names:
+//				Vector<DevBean> filtered = GitRead.findFiles(devList);
+				
+
+				
+//				System.out.println(commits.size() + " is size of commits vector");
 				
 				
 				
