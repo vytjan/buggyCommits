@@ -9,20 +9,22 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Vector;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import csvWriter.ToCSV;
 import unibz.emse.versioningSystem.bean.BlameBean;
 import unibz.emse.versioningSystem.bean.CommitBean;
 import unibz.emse.versioningSystem.bean.DevBean;
 import unibz.emse.versioningSystem.bean.DiffBean;
+import unibz.emse.versioningSystem.bean.FinalBean;
 
 public class GitRead {
-	public static Vector<DiffBean> readDiff(String logFilePath, String commitId, String author, Date commitDate) throws IOException, ParseException{
-		Vector<DiffBean> resultDiff = new Vector<DiffBean>();
-		Vector<Integer> removedLines = new Vector<Integer>();
-		DiffBean singleDiffBean = new DiffBean();
-		
+	public static Vector<FinalBean> readDiff(String logFilePath, String commitIdEnd, String commitIdStart, String author, Date endDate, Date startDate, String fileName) throws IOException, ParseException{
+		Vector<FinalBean> result = new Vector<FinalBean>();
+		Vector<Integer> addedLines = new Vector<Integer>();
+		FinalBean singleResult = new FinalBean();
 		
 		//added lines
 		String regexLineAdded = Pattern.quote("+ ") + Pattern.compile("(.*?)");
@@ -37,9 +39,9 @@ public class GitRead {
 		Pattern.quote(" +") + Pattern.compile("(.*?)") + Pattern.quote(" @@");
 		Pattern patternLineNumbers = Pattern.compile(regexLineNumbers);
 		
-		//name of file modified:
-		String regexName = Pattern.quote("diff --git a/") + Pattern.compile("(.*?)") + Pattern.quote(" ") + Pattern.compile("(.*?)");
-		Pattern patternName = Pattern.compile(regexName);
+//		//name of file modified:
+//		String regexName = Pattern.quote("diff --git a/") + Pattern.compile("(.*?)") + Pattern.quote(" ") + Pattern.compile("(.*?)");
+//		Pattern patternName = Pattern.compile(regexName);
 		
 		//if commented lines start
 		String regexCommentStart = Pattern.compile("(.*?)") + Pattern.quote("/*") + Pattern.compile("(.*?)");
@@ -72,7 +74,7 @@ public class GitRead {
 		//Read File Line By Line
 readFile:	while ((strLine = br.readLine()) != null)   {
 			Matcher matcherLineNumbers = patternLineNumbers.matcher(strLine);
-			Matcher matcherName = patternName.matcher(strLine);
+//			Matcher matcherName = patternName.matcher(strLine);
 //			Matcher matcherLineRemoved = patternLineRemoved.matcher(strLine);
 			Matcher matcherLineAdded = patternLineAdded.matcher(strLine);
 			Matcher matcherCommentStart = patternCommentStart.matcher(strLine);
@@ -82,76 +84,83 @@ readFile:	while ((strLine = br.readLine()) != null)   {
 			Matcher matcherCommentContinue2 = patternCommentContinue2.matcher(strLine);
 			
 			
-//			//if it's a single line comment
-//			if(matcherCommentLine.find()){
-////				System.out.println(strLine);
-//				continue readFile;
-//			}
-//			//if line is a comment
-//			if(matcherCommentStart.find()){
-////				System.out.println(strLine);
-//				continue readFile;
-//			}
-//			if(matcherCommentContinue.find() || matcherCommentContinue2.find()){
-////				System.out.println(strLine);
-//				continue readFile;
-//			}
-//			if(matcherCommentEnd.find()) {
-////				System.out.println(strLine);
-//				continue readFile;
-//			}
+			//if it's a single line comment
+			if(matcherCommentLine.find()){
+//				System.out.println(strLine);
+				continue readFile;
+			}
+			//if line is a comment
+			if(matcherCommentStart.find()){
+//				System.out.println(strLine);
+				continue readFile;
+			}
+			if(matcherCommentContinue.find() || matcherCommentContinue2.find()){
+//				System.out.println(strLine);
+				continue readFile;
+			}
+			if(matcherCommentEnd.find()) {
+//				System.out.println(strLine);
+				continue readFile;
+			}
 			
 //			System.out.println(strLine);
 				if(strLine.startsWith("diff --git")){
 					
 					//set id of commit to diffBean
-					singleDiffBean.setCommitId(commitId);
-					singleDiffBean.setDate(commitDate);
+					singleResult.setStartDate(startDate);
+					singleResult.setEndDate(endDate);
+					singleResult.setFile(fileName);
 					
-					singleDiffBean.setAuthor(author);
-					if(singleDiffBean.getFile() != null){
-						if(removedLines.size() > 0){
-							System.out.println("Removed lines are: " + removedLines );
-							singleDiffBean.setRemovedLines(removedLines);
+					singleResult.setAuthor(author);
+					if(singleResult.getFile() != null){
+						if(addedLines.size() > 0){
+//							System.out.println("Added lines are: " + addedLines );
+							singleResult.setLoc(addedLines.size());
 						}
-						resultDiff.addElement(singleDiffBean);
+						result.addElement(singleResult);
 					}
-					singleDiffBean = new DiffBean();
+					singleResult = new FinalBean();
 				}
 				
 				//match file name
-				if(matcherName.find()) {
-					String fileName = matcherName.group(1);
-					singleDiffBean.setFile(fileName);
-				}
+//				if(matcherName.find()) {
+//					String fileName = matcherName.group(1);
+//					singleDiffBean.setFile(fileName);
+//				}
 					
 				if(matcherLineNumbers.find()){
-					String removedNumber = matcherLineNumbers.group(1);
-					String removedQuantity = matcherLineNumbers.group(2);
-					//singleDiffBean.setRemovedNumber(removedNumber);
-					lineNumber = Integer.parseInt(removedNumber);
-					//System.out.println(removedNumber + "," + removedQuantity);
+					String addedNumber = matcherLineNumbers.group(1);
+					String addedQuantity = matcherLineNumbers.group(2);
+					lineNumber = Integer.parseInt(addedNumber);
+//					singleResult.setAddedNumber(lineNumber);
+					
+					System.out.println(addedNumber + "," + addedQuantity);
 					lineNumber = lineNumber -1;
 				}
 		
 				//collect numbers of removed lines
-				if(strLine.startsWith("- ")){
-					int removedLine = lineNumber;					
-					removedLines.add(removedLine);
+				if(strLine.startsWith("+ ")){
+					int addedLine = lineNumber;					
+					addedLines.add(addedLine);
 //					System.out.println(removedLine + " is a removed line number");				
 				}
 				
-				if(strLine.startsWith("+ ")){
+				if(strLine.startsWith("- ")){
 					lineNumber--;
 				}
 					lineNumber++;
 		}
-		resultDiff.addElement(singleDiffBean);
+		
+		singleResult.setStartDate(startDate);
+		singleResult.setEndDate(endDate);
+		singleResult.setFile(fileName);
+		
+		result.addElement(singleResult);
 		//System.out.println(resultDiff.size() + " a size of resultDiff");
 		//Close the input stream
 		br.close();
 
-		return resultDiff;
+		return result;
 	}
 	
 	public static Vector<DiffBean> readDiffBuggy(String logFilePath, String commitId, String author, Date commitDate) throws IOException, ParseException{
@@ -378,15 +387,37 @@ readFile:	while ((strLine = br.readLine()) != null)   {
 
 		return bugs;
 	}
+	
+	/**
+	 * Get a diff between two dates
+	 * @param date1 the oldest date
+	 * @param date2 the newest date
+	 * @param timeUnit the unit in which you want the diff
+	 * @return the diff value, in the provided unit
+	 */
+	public static long getDateDiff(Date date1, Date date2, TimeUnit timeUnit) {
+	    long diffInMillies = date2.getTime() - date1.getTime();
+	    return timeUnit.convert(diffInMillies,TimeUnit.MILLISECONDS);
+	}
+
 
 	
-	public static Vector<DevBean> getDevs(Vector<CommitBean> commits){
+	public static Vector<FinalBean> getDevs(Vector<CommitBean> commits){
 		
 		HashSet<String> developers = new HashSet<String>();
 		Vector<DevBean> devs = new Vector<DevBean>();
+		Vector<FinalBean> partResult = new Vector<FinalBean>();
+		//single final bean
+		FinalBean singleFinal = new FinalBean();
+		
 		for(CommitBean commit:commits){
 			developers.add(commit.getAuthor());
 		}
+		
+		//check if a test file:
+		String regexTestFile = Pattern.compile("(.*?)") + Pattern.quote("Test") + Pattern.compile("(.*?)");
+		Pattern patternTestFile = Pattern.compile(regexTestFile);
+		
 		
 		//set email of the dev on DevBean
 		for(String dev:developers){
@@ -408,16 +439,63 @@ readFile:	while ((strLine = br.readLine()) != null)   {
 			singleDev.setCommits(commitsVector);
 		}
 		
-		return devs;
+		for(DevBean dev:devs){
+//			System.out.println(dev.getCommits().size());
+			
+			//remove commits not containing 
+			for(int i = 0; i<dev.getCommits().size(); i++){
+				
+				CommitBean commitBefore = dev.getCommits().get(i);
+				
+				for(int j = i+1; j < dev.getCommits().size(); j++){
+					
+					CommitBean commitAfter = dev.getCommits().get(j);
+					
+					if(commitBefore.getModifiedFiles() != null && commitBefore.getModifiedFiles().size() > 0){
+						for(String comBefore:commitBefore.getModifiedFiles()){
+							if(commitAfter.getModifiedFiles() != null && commitAfter.getModifiedFiles().size() > 0){
+								for(String fileName:commitAfter.getModifiedFiles()){
+									Matcher matcherTestFile = patternTestFile.matcher(comBefore);
+									if(comBefore.equals(fileName) && comBefore.endsWith(".java") && !matcherTestFile.find()){
+										long difference = getDateDiff(commitAfter.getDate(), commitBefore.getDate(),TimeUnit.DAYS);
+										if(difference >-1){
+											//setting all the necessarry vars for the final data output
+											singleFinal.setAuthor(commitAfter.getAuthor());
+											singleFinal.setStartDate(commitBefore.getDate());
+	//										System.out.println(commitAfter.getAuthor() + " " + commitBefore.getDate());
+											singleFinal.setEndDate(commitAfter.getDate());
+											singleFinal.setFile(fileName);
+											singleFinal.setDays(difference);
+											if(commitAfter.getBuggy()){
+												singleFinal.setBuggy(true);
+											} else {
+												singleFinal.setBuggy(false);
+											}
+											
+											partResult.addElement(singleFinal);
+											singleFinal = new FinalBean();
+											System.out.println(fileName + " " + commitAfter.getCommitId() + " " + commitBefore.getCommitId() + " " + comBefore);
+										}
+									}
+									
+								}	
+							}
+						}	
+					}
+				}	
+			}
+		}
+		
+		return partResult;
 	}
 	
-	public static Vector<DevBean> findFiles(Vector<DevBean> origin) throws IOException, InterruptedException, ParseException {
+	public static Vector<FinalBean> findFiles(Vector<DevBean> origin) throws IOException, InterruptedException, ParseException {
 		Vector<DevBean> modified = new Vector<DevBean>();
+		Vector<FinalBean> allFiles = new Vector<FinalBean>();
 		
 		//check if a test file:
 		String regexTestFile = Pattern.compile("(.*?)") + Pattern.quote("Test") + Pattern.compile("(.*?)");
 		Pattern patternTestFile = Pattern.compile(regexTestFile);
-		
 		
 		//print the list of developers
 		int num = 0;
@@ -436,20 +514,24 @@ readFile:	while ((strLine = br.readLine()) != null)   {
 					if(commitBefore.getModifiedFiles() != null && commitBefore.getModifiedFiles().size() > 0){
 						for(String comBefore:commitBefore.getModifiedFiles()){
 							if(commitAfter.getModifiedFiles() != null && commitAfter.getModifiedFiles().size() > 0){
-								for(String comAfter:commitAfter.getModifiedFiles()){
+								for(String fileName:commitAfter.getModifiedFiles()){
 									Matcher matcherTestFile = patternTestFile.matcher(comBefore);
-									if(comBefore.equals(comAfter) && !comBefore.endsWith(".txt") && !comBefore.endsWith(".xml") && !matcherTestFile.find()){
+									if(comBefore.equals(fileName) && !comBefore.endsWith(".rdf") && !comBefore.endsWith(".txt") && !comBefore.endsWith(".xml") && !matcherTestFile.find()){
 										//System.out.println(comBefore + " " + comAfter);
 										//git diff
 										
-//										GitSzz.getDiff("/home/vytautas/Desktop/commons-io", "/usr/bin/git", "/home/vytautas/Desktop/commons-io/diff.txt", "/home/vytautas/Desktop/", commitBefore.getCommitId(), commitAfter.getCommitId(), comAfter);
-//										Vector<DiffBean> diffVector = GitRead.readDiff("/home/vytautas/Desktop/commons-io/diff.txt", commitAfter.getCommitId(), commitAfter.getAuthor(), commitAfter.getDate());
+										GitSzz.getDiff("/home/vytautas/Desktop/commons-io", "/usr/bin/git", "/home/vytautas/Desktop/commons-io/diff.txt", "/home/vytautas/Desktop/", commitBefore.getCommitId(), commitAfter.getCommitId(), fileName);
+										Vector<FinalBean> finalVector = GitRead.readDiff("/home/vytautas/Desktop/commons-io/diff.txt", commitAfter.getCommitId(), commitBefore.getCommitId(), commitAfter.getAuthor(), commitAfter.getDate(), commitBefore.getDate(), fileName);
 //										for(DiffBean singleDiff:diffVector){
-										//	System.out.println(singleDiff.getRemovedNumber());
+////											System.out.println(singleDiff.getCommitId() + " after commit date " + singleDiff.getDate() + " " + singleDiff.getAuthor() + " before commit date " + commitBefore.getDate());
+////											System.out.println(singleDiff.getAddedNumber());
 //										}
 										num++;
 										System.out.println(num);
+										System.out.println();
+										allFiles.addAll(finalVector);
 									}
+									
 								}	
 							}
 						}	
@@ -458,6 +540,6 @@ readFile:	while ((strLine = br.readLine()) != null)   {
 			}
 		}
 		
-		return modified;
+		return allFiles;
 	}
 }

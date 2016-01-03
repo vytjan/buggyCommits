@@ -14,10 +14,12 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import csvWriter.ToCSV;
 import unibz.emse.versioningSystem.bean.BlameBean;
 import unibz.emse.versioningSystem.bean.CommitBean;
 import unibz.emse.versioningSystem.bean.DevBean;
 import unibz.emse.versioningSystem.bean.DiffBean;
+import unibz.emse.versioningSystem.bean.FinalBean;
 import unibz.emse.versioningSystem.git.GitRead;
 import unibz.emse.versioningSystem.git.GitSzz;
 import unibz.emse.versioningSystem.git.GitUtilities;
@@ -92,7 +94,7 @@ public class Test {
 				
 //				//Parse every diff command from diff.txt file
 				Vector<DiffBean> diffVector = GitRead.readDiffBuggy("/home/vytautas/Desktop/commons-io/diff.txt", singleCommitId, singleCommitAuthor, singleCommitDate);
-				for(DiffBean singleDiff: diffVector){
+//				for(DiffBean singleDiff: diffVector){
 //					System.out.println(singleDiff.getRemovedQuantity() + " is a quantity removed");
 //					System.out.println(singleDiff.getFile() + " is a filename");
 //						for(Integer singleNumber:singleDiff.getRemovedLines()){
@@ -100,7 +102,7 @@ public class Test {
 //						}
 //					System.out.println(singleDiff.getRemovedLines());
 					
-				}
+//				}
 				//System.out.println(diffVector.size() + " is a size of diffVector");
 				
 				//checkout to every different commit version	
@@ -144,20 +146,34 @@ public class Test {
 										}
 									}
 									laterCommit.setBuggy(true);
-//									System.out.println(laterCommit.getDate() + " is the most recent date");
+									System.out.println(laterCommit.getDate() + " is the most recent date");
 								}
 							}
 						}
 					}
 				}
 				
+//				ToCSV.generateCsvFile("/home/vytautas/Desktop/commons-io/commits.csv", commits);
+				
+//				for(CommitBean singleCommm:commits){
+//					if(singleCommm.getBuggy()){
+//						System.out.println(singleCommm.getCommitId());
+//					}
+//				}
+				
 				//get full list of developers
-//				Vector<DevBean> devList = GitRead.getDevs(commits);
+				Vector<FinalBean> devList = GitRead.getDevs(commits);
+				ToCSV.generateCsvFile("/home/vytautas/Desktop/commons-io/commits.csv", devList);
+//				for(DevBean singleDevs:devList){
+//					System.out.println(singleDevs.getCommits().size() + "AAAA");
+//				}
 				
 				//filter Commits only to those containing same file names:
-//				Vector<DevBean> filtered = GitRead.findFiles(devList);
-				
-
+//				Vector<FinalBean> filtered = GitRead.findFiles(devList);
+//				
+//				for(FinalBean singleDev:filtered){
+//					System.out.println(singleDev.getCommits().size());
+//				}
 				
 //				System.out.println(commits.size() + " is size of commits vector");
 				

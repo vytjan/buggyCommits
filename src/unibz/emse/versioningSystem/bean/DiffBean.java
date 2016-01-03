@@ -11,8 +11,8 @@ public class DiffBean {
 	private String removedQuantity;
 //	private Vector<String> modifiedLines;
 	private Vector<Integer> removedLines;
-	private String addedNumber;
-	private String removedNumber;
+	private Integer addedNumber;
+	private Integer removedNumber;
 //	private Vector<String> blame;
 	
 	public String getFile() {
@@ -50,19 +50,19 @@ public class DiffBean {
 		this.commitId = inCommitId;
 	}
 	
-	public String getAddedNumber() {
+	public Integer getAddedNumber() {
 		return addedNumber;
 	}
 	
-	public void setAddedNumber(String addedNumber) {
-		this.addedNumber = commitId;
+	public void setAddedNumber(Integer addedNumber) {
+		this.addedNumber = addedNumber;
 	}
 	
-	public String getRemovedNumber() {
+	public Integer getRemovedNumber() {
 		return removedNumber;
 	}
 	
-	public void setRemovedNumber(String removedNumber) {
+	public void setRemovedNumber(Integer removedNumber) {
 		this.removedNumber = removedNumber;
 	}
 	

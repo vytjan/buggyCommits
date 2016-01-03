@@ -72,3 +72,8 @@ QQQ Do I need to count if the line was modified by a different author, or just a
 
 QQQ if need to look for empty lines in git blame when finding buggy commit?
 QQQ why git blame id's of commits are 8 dig, when log id's are 7 dig?
+
+
+DDL for final project report: January 15th
+Final project presentation: January 19th
+Professor Bavota comes to Bolzano at 18th.
