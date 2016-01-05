@@ -12,6 +12,24 @@ public class FinalBean {
 	private Long daysLength;
 	private Integer commitsLength;
 	private Boolean buggy;
+	private String commitId;
+	private String idBefore;
+	
+	public String getCommitId(){
+		return commitId;
+	}
+	
+	public void setCommitId(String id){
+		this.commitId = id;
+	}
+	
+	public String getCommitBefore(){
+		return idBefore;
+	}
+	
+	public void setCommitBefore(String id){
+		this.idBefore = id;
+	}
 	
 	public String getAuthor() {
 		return author;

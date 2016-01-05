@@ -39,6 +39,14 @@ public class ToCSV
 	    	writer.append(",");
 	    	writer.append(singleResult.getDays().toString());
 	    	writer.append(",");
+	    	writer.append(singleResult.getCommits().toString());
+	    	writer.append(",");
+	    	writer.append(singleResult.getNoOfDevs().toString());
+	    	writer.append(",");
+	    	writer.append(singleResult.getCommitBefore());
+	    	writer.append(",");
+	    	writer.append(singleResult.getCommitId());
+	    	writer.append(",");
 	    	writer.append(singleResult.getBuggy().toString());
 	    	writer.append('\n');
 	    }	
