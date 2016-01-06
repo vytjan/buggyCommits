@@ -15,10 +15,9 @@ import unibz.emse.versioningSystem.bean.DiffBean;
 import unibz.emse.versioningSystem.bean.FinalBean;
 
 public class GitRead {
-	public static Vector<FinalBean> readDiff(String logFilePath, String commitIdEnd, String commitIdStart, String author, Date endDate, Date startDate, String fileName) throws IOException, ParseException{
-		Vector<FinalBean> result = new Vector<FinalBean>();
+	public static Integer readDiff(String logFilePath) throws IOException, ParseException{
 		Vector<Integer> addedLines = new Vector<Integer>();
-		FinalBean singleResult = new FinalBean();
+		Integer result = 0;
 		
 		//added lines
 		String regexLineAdded = Pattern.quote("+ ") + Pattern.compile("(.*?)");
@@ -27,15 +26,6 @@ public class GitRead {
 		//removed lines
 		String regexLineRemoved = Pattern.quote("- ") + Pattern.compile("(.*?)");
 		Pattern patternLineRemoved = Pattern.compile(regexLineRemoved);
-		
-		//number and position of lines removed:
-		String regexLineNumbers = Pattern.quote("@@ -") + Pattern.compile("(.*?)") + Pattern.quote(",") + Pattern.compile("(.*?)") +
-		Pattern.quote(" +") + Pattern.compile("(.*?)") + Pattern.quote(" @@");
-		Pattern patternLineNumbers = Pattern.compile(regexLineNumbers);
-		
-//		//name of file modified:
-//		String regexName = Pattern.quote("diff --git a/") + Pattern.compile("(.*?)") + Pattern.quote(" ") + Pattern.compile("(.*?)");
-//		Pattern patternName = Pattern.compile(regexName);
 		
 		//if commented lines start
 		String regexCommentStart = Pattern.compile("(.*?)") + Pattern.quote("/*") + Pattern.compile("(.*?)");
@@ -54,23 +44,15 @@ public class GitRead {
 		
 		String regexCommentContinue2 = Pattern.quote("+") + Pattern.compile("\\s+") + Pattern.quote("*") + Pattern.compile("(.*?)");
 		Pattern patternCommentContinue2 = Pattern.compile(regexCommentContinue2);
-		
 		// commented lines end
 		
 		FileInputStream fstream = new FileInputStream(logFilePath);
 		BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
 		
 		String strLine;
-		//line number count
-		int lineNumber = 0;
-		boolean startCount = false;
 		
 		//Read File Line By Line
 readFile:	while ((strLine = br.readLine()) != null)   {
-			Matcher matcherLineNumbers = patternLineNumbers.matcher(strLine);
-//			Matcher matcherName = patternName.matcher(strLine);
-//			Matcher matcherLineRemoved = patternLineRemoved.matcher(strLine);
-			Matcher matcherLineAdded = patternLineAdded.matcher(strLine);
 			Matcher matcherCommentStart = patternCommentStart.matcher(strLine);
 			Matcher matcherCommentEnd = patternCommentEnd.matcher(strLine);
 			Matcher matcherCommentLine = patternCommentLine.matcher(strLine);
@@ -96,66 +78,31 @@ readFile:	while ((strLine = br.readLine()) != null)   {
 //				System.out.println(strLine);
 				continue readFile;
 			}
-			
-//			System.out.println(strLine);
-				if(strLine.startsWith("diff --git")){
-					
-					//set id of commit to diffBean
-					singleResult.setStartDate(startDate);
-					singleResult.setEndDate(endDate);
-					singleResult.setFile(fileName);
-					
-					singleResult.setAuthor(author);
-					if(singleResult.getFile() != null){
-						if(addedLines.size() > 0){
-//							System.out.println("Added lines are: " + addedLines );
-							singleResult.setLoc(addedLines.size());
-						}
-						result.addElement(singleResult);
-					}
-					singleResult = new FinalBean();
-				}
-				
-				//match file name
-//				if(matcherName.find()) {
-//					String fileName = matcherName.group(1);
-//					singleDiffBean.setFile(fileName);
-//				}
-					
-				if(matcherLineNumbers.find()){
-					String addedNumber = matcherLineNumbers.group(1);
-					String addedQuantity = matcherLineNumbers.group(2);
-					lineNumber = Integer.parseInt(addedNumber);
-//					singleResult.setAddedNumber(lineNumber);
-					
-					System.out.println(addedNumber + "," + addedQuantity);
-					lineNumber = lineNumber -1;
-				}
 		
-				//collect numbers of removed lines
-				if(strLine.startsWith("+ ")){
-					int addedLine = lineNumber;					
-					addedLines.add(addedLine);
-//					System.out.println(removedLine + " is a removed line number");				
+				//collect numbers of + lines
+				if(strLine.startsWith("+ ")){				
+					addedLines.add(1);
+//					System.out.println(addedLine + " is a rem line number");				
 				}
 				
-				if(strLine.startsWith("- ")){
-					lineNumber--;
-				}
-					lineNumber++;
+//				if(strLine.startsWith("- ")){
+//					lineNumber--;
+//				}
+//					lineNumber++;
 		}
 		
-		singleResult.setStartDate(startDate);
-		singleResult.setEndDate(endDate);
-		singleResult.setFile(fileName);
-		
-		result.addElement(singleResult);
-		//System.out.println(resultDiff.size() + " a size of resultDiff");
 		//Close the input stream
 		br.close();
 
+		if(addedLines.size() > 0){
+//			System.out.println("Added lines are: " + addedLines );
+			result = addedLines.size();
+		}
+		
 		return result;
 	}
+	
+	
 	
 	public static Vector<DiffBean> readDiffBuggy(String logFilePath, String commitId, String author, Date commitDate) throws IOException, ParseException{
 		Vector<DiffBean> resultDiff = new Vector<DiffBean>();

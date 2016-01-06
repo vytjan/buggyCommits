@@ -19,7 +19,7 @@ import unibz.emse.versioningSystem.bean.FinalBean;
 public class DevelopersNumber {
 	
 	public static void getRevList(String repositoryLocalPath,
-			String gitCommand, String outputPath, String tmpFolder, String commitBefore, String commitAfter, String fileName) throws IOException, InterruptedException {
+			String gitCommand, String outputPath, String tmpFolder, String commit1, String commit2, String fileName) throws IOException, InterruptedException {
 			//[START] Create a temporary file where we write the commands
 				//that we want to execute from command line
 				File commandsToExecute = new File(tmpFolder + "/commands.sh");
@@ -29,7 +29,7 @@ public class DevelopersNumber {
 				//[START] We print the command that we want to execute
 				PrintWriter pw = new PrintWriter(commandsToExecute);
 				pw.println("cd " + repositoryLocalPath);
-				pw.println(gitCommand + " rev-list " + commitBefore + "..." + commitAfter +  " > " + outputPath);
+				pw.println(gitCommand + " rev-list " + commit1 + "..." + commit2 +  " > " + outputPath);
 				pw.close();
 				//[END]
 				

@@ -33,20 +33,44 @@ public class Test {
 
 	public static void main(String[] args) throws Exception {
 		
-		String logFilePath = "/home/vytautas/Desktop/commons-io/log.txt";
+		//dynamic one
+		String repoPath = "/home/vytautas/Desktop/commons-io";
+		
+		String gitCommand = "/usr/bin/git";
+		String tempPath = "/home/vytautas/Desktop/";
+		
+		//partial results path
+		String diffPath = "/diff.txt";
+		String blamePath = "/blame.txt";
+		String logFilePath = "/log.txt";
+		String revisionPath = "/revlist.txt";
+		
+		//final csv path
+		String finalPath = "/commits.csv";
+		
+		//jira stuff
+		String jiraUrl = "https://issues.apache.org/jira/";
+		String jiraProject = "IO";
+		String issueType = "BUG";
+		String issueStatus = "RESOLVED";
+		
+		//url's of projects
+		String projectUrl = "https://github.com/apache/commons-io.git";
 		
 		try {
 			
-			//GitUtilities.cloneGitRepositoryUnix("https://github.com/apache/commons-io.git", 
-			//		"/home/vytautas/Desktop", "/usr/bin/git", "/home/vytautas/Desktop/");
-			GitSzz.restore("/home/vytautas/Desktop/commons-io", "/usr/bin/git", "/home/vytautas/Desktop/");
-			GitUtilities.getLogFromGitRepository("/home/vytautas/Desktop/commons-io", "/usr/bin/git", logFilePath, "/home/vytautas/Desktop/");
+			//GitUtilities.cloneGitRepositoryUnix(projectUrl, tempPath, gitCommand, tempPath);
+			GitSzz.restore(repoPath, gitCommand, tempPath);
+			GitUtilities.getLogFromGitRepository(repoPath, gitCommand, repoPath + logFilePath, tempPath);
 			
 			//get full log of commits
-			Vector<CommitBean> commits = GitUtilities.readCommits(logFilePath);
+			Vector<CommitBean> commits = GitUtilities.readCommits(repoPath + logFilePath);
 			
+			
+
 			/*Mine all the single project issues from Jira*/
-			Vector<IssueBean> collectToReturn = JiraMining.mineIssues("https://issues.apache.org/jira/", "IO", "BUG", "RESOLVED", null, null, null);
+			//@TODO change static vars to dynamic
+			Vector<IssueBean> collectToReturn = JiraMining.mineIssues(jiraUrl, jiraProject, issueType, issueStatus, null, null, null);
 			
 			//collect commits which fixed bugs
 			Vector<CommitBean> bugFixCommits = new Vector<CommitBean>();
@@ -74,8 +98,6 @@ public class Test {
 			}
 			
 			
-			//if "checkout to HEAD branch"
-			
 			//git diff on every file of commit:
 			for(CommitBean singleBugFix:bugFixCommits){
 				String singleCommitId = singleBugFix.getCommitId();
@@ -86,26 +108,25 @@ public class Test {
 				
 //				System.out.println(singleCommitId + " if is duplicated");
 				//Get diff for every commit
-				GitSzz.getDiffBuggy("/home/vytautas/Desktop/commons-io", "/usr/bin/git", "/home/vytautas/Desktop/commons-io/diff.txt", "/home/vytautas/Desktop/", singleCommitId);
+				GitSzz.getDiffBuggy(repoPath, gitCommand, repoPath + diffPath, tempPath, singleCommitId);
 				
 //				//Parse every diff command from diff.txt file
-				Vector<DiffBean> diffVector = GitRead.readDiffBuggy("/home/vytautas/Desktop/commons-io/diff.txt", singleCommitId, singleCommitAuthor, singleCommitDate);
+				Vector<DiffBean> diffVector = GitRead.readDiffBuggy(repoPath + diffPath, singleCommitId, singleCommitAuthor, singleCommitDate);
 
 				
-				//checkout to every different commit version	
-				
+				//checkout to every different commit version
 				//get the blame history of every file in checkouted commit
 				for(DiffBean singleDiff:diffVector) {
 					String fileNameToBlame = singleDiff.getFile();
 					Vector<Integer> lineNumbers = singleDiff.getRemovedLines();
 					String singleComId = singleDiff.getCommitId();
-					GitSzz.checkoutCommit("/home/vytautas/Desktop/commons-io", "/usr/bin/git", "/home/vytautas/Desktop/", singleComId);
+					GitSzz.checkoutCommit(repoPath, gitCommand, tempPath, singleComId);
 					
 					//git blame for every file to .txt
-					GitSzz.getBlameHistory("/home/vytautas/Desktop/commons-io", "/usr/bin/git", "/home/vytautas/Desktop/commons-io/blame.txt", "/home/vytautas/Desktop/", fileNameToBlame);
+					GitSzz.getBlameHistory(repoPath, gitCommand, repoPath + blamePath, tempPath, fileNameToBlame);
 //					
 					//parse git blame
-					Vector<String> blame = GitRead.readBlame("/home/vytautas/Desktop/commons-io/blame.txt", lineNumbers);
+					Vector<String> blame = GitRead.readBlame(repoPath + blamePath, lineNumbers);
 
 					
 					//detect the most recent commit -> the one which introduced a bug
@@ -139,12 +160,22 @@ public class Test {
 				}
 			}
 			
-			//get full list of developers
-			Vector<FinalBean> devList = ExtractFiles.getDevs(commits);
-			
+			//get full data in one final bean
+			Vector<FinalBean> devList = ExtractFiles.getDevs(repoPath, gitCommand, repoPath + diffPath, tempPath, repoPath + revisionPath, commits);
+			System.out.println(devList.size() + " is a size of devlist");
+			//
+		
+			int numb = 0;
+			//get #LOC of every file
+			for(FinalBean singleDev:devList){
+				GitSzz.getDiff(repoPath, gitCommand, repoPath + diffPath, tempPath, singleDev.getCommit1(), singleDev.getCommit2(), singleDev.getFile());
+				int loc = GitRead.readDiff( repoPath + diffPath);
+				singleDev.setLoc(loc);
+				System.out.println(numb++);
+			}
 			
 			//put final data to csv file
-			ToCSV.generateCsvFile("/home/vytautas/Desktop/commons-io/commits.csv", devList);
+			ToCSV.generateCsvFile(repoPath + finalPath, devList);
 			
 		} catch (IOException | InterruptedException e) {
 			// TODO Auto-generated catch block

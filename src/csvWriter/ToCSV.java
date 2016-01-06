@@ -16,17 +16,22 @@ public class ToCSV
 	    FileWriter writer = new FileWriter(sFileName);
 		 
 	    //write title for every column - maybe remove later
-//	    writer.append("DEV_NAME");
-//	    writer.append(',');
-////	    writer.append("START");
-////	    writer.append(",");
-//	    writer.append("END");
-//	    writer.append(",");
-////	    writer.append("FILE_N");
-////	    writer.append(",");
-////	    writer.append("NUM_DEVS");
-//	    writer.append("BUGGY");
-//	    writer.append('\n');
+	    writer.append("DEV_NAME");
+	    writer.append(',');
+	    writer.append("START");
+	    writer.append(",");
+	    writer.append("END");
+	    writer.append(",");
+	    writer.append("FILE_N");
+	    writer.append(",");
+	    writer.append("DAYS");
+	    writer.append(",");
+	    writer.append("COMMITS");
+	    writer.append(",");
+	    writer.append("NUM_DEVS");
+	    writer.append(",");
+	    writer.append("LOC");
+	    writer.append('\n');
 	    
 	    for(FinalBean singleResult:result){
 	    	writer.append(singleResult.getAuthor());
@@ -43,9 +48,11 @@ public class ToCSV
 	    	writer.append(",");
 	    	writer.append(singleResult.getNoOfDevs().toString());
 	    	writer.append(",");
-	    	writer.append(singleResult.getCommitBefore());
+	    	writer.append(singleResult.getLoc().toString());
 	    	writer.append(",");
-	    	writer.append(singleResult.getCommitId());
+	    	writer.append(singleResult.getCommit1());
+	    	writer.append(",");
+	    	writer.append(singleResult.getCommit2());
 	    	writer.append(",");
 	    	writer.append(singleResult.getBuggy().toString());
 	    	writer.append('\n');

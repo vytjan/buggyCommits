@@ -230,7 +230,7 @@ public class GitUtilities {
 	 */
 	public static Vector<CommitBean> readCommits(String logFilePath) throws IOException, ParseException{
 		Vector<CommitBean> result = new Vector<CommitBean>();
-		Vector modifiedFiles = new Vector();
+		Vector<String> modifiedFiles = new Vector<String>();
 		Vector addedFiles = new Vector();
 		Vector deletedFiles = new Vector();
 		CommitBean singleCommit = new CommitBean();
@@ -274,7 +274,11 @@ public class GitUtilities {
 						} if(deletedFiles.size() > 0) {
 							singleCommit.setDeletedFiles(deletedFiles);
 						}
+						
 						result.addElement(singleCommit);
+						modifiedFiles = new Vector<String>();
+						addedFiles = new Vector<String>();
+						deletedFiles = new Vector<String>();
 						singleCommit = new CommitBean();
 					}
 
@@ -293,7 +297,7 @@ public class GitUtilities {
 						singleCommit.setBuggy(false);
 						singleCommit.setCommitId(matcherCommitId.group(1));
 					}  if(matcherCommitDate.find()) {
-						DateFormat format = new SimpleDateFormat("yyyy-mm-dd HH:mm:ss Z", Locale.ENGLISH);
+						DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss X", Locale.ENGLISH);
 						Date date = format.parse(matcherCommitDate.group(1));
 						singleCommit.setDate(date);
 					} if(matcherCommitMessage.find()) {
@@ -313,21 +317,6 @@ public class GitUtilities {
 				if(strLine.startsWith("D	")) {
 					deletedFiles.addElement(strLine.substring(2));
 				}
-			}
-			if(singleCommit.getCommitId() != null) {
-				//System.out.println(modifiedFiles.size() + " is a size of M files vector");
-				if(modifiedFiles.size() > 0) {
-					singleCommit.setModifiedFiles(modifiedFiles);
-				} if(addedFiles.size() > 0) {
-					singleCommit.setAddedFiles(addedFiles);
-				} if(deletedFiles.size() > 0) {
-					singleCommit.setDeletedFiles(deletedFiles);
-				}
-				result.addElement(singleCommit);
-				modifiedFiles = new Vector<String>();
-				addedFiles = new Vector<String>();
-				deletedFiles = new Vector<String>();
-				singleCommit = new CommitBean();
 			}
 		}
 		

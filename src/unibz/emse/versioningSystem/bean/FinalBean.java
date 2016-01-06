@@ -15,19 +15,19 @@ public class FinalBean {
 	private String commitId;
 	private String idBefore;
 	
-	public String getCommitId(){
+	public String getCommit2(){
 		return commitId;
 	}
 	
-	public void setCommitId(String id){
+	public void setCommit2(String id){
 		this.commitId = id;
 	}
 	
-	public String getCommitBefore(){
+	public String getCommit1(){
 		return idBefore;
 	}
 	
-	public void setCommitBefore(String id){
+	public void setCommit1(String id){
 		this.idBefore = id;
 	}
 	
