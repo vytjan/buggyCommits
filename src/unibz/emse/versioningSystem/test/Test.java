@@ -37,8 +37,9 @@ public class Test {
 //		String repoPath = "/home/vytautas/Desktop/commons-io";
 //		String repoPath = "/home/vytautas/Desktop/ant-ivy";
 //		String repoPath = "/home/vytautas/Desktop/activemq-apollo";
-//		String repoPath = "/home/vytautas/Desktop/any23";
-		String repoPath = "/home/vytautas/Desktop/ddlutils";
+//		String repoPath = "/home/vytautas/Desktop/ddlutils";
+//		String repoPath = "/home/vytautas/Desktop/karaf";
+		String repoPath = "/home/vytautas/Desktop/cxf";
 		
 		String gitCommand = "/usr/bin/git";
 		String tempPath = "/home/vytautas/Desktop/";
@@ -59,9 +60,9 @@ public class Test {
 //		String jiraProject = "IO";
 //		String jiraProject = "IVY";
 //		String jiraProject = "AMQ";
-//		String jiraProject = "AMQ";
-//		String jiraProject = "ANY23"; not this, smth wrong with it
-		String jiraProject = "DDLUTILS";
+//		String jiraProject = "DDLUTILS";
+//		String jiraProject = "KARAF";
+		String jiraProject = "CXF";
 		String issueType = "BUG";
 		String issueStatus = "RESOLVED";
 		
@@ -70,12 +71,13 @@ public class Test {
 //		String projectUrl = "https://github.com/apache/commons-io.git";
 //		String projectUrl = "https://github.com/apache/ant-ivy.git";
 //		String projectUrl = "https://github.com/apache/activemq-apollo.git";
-//		String projectUrl = "https://github.com/apache/any23.git";
-		String projectUrl = "https://github.com/apache/ddlutils.git";
+//		String projectUrl = "https://github.com/apache/ddlutils.git";
+//		String projectUrl = "https://github.com/apache/karaf.git";
+		String projectUrl = "https://github.com/apache/cxf.git";
 		
 		try {
 			
-			GitUtilities.cloneGitRepositoryUnix(projectUrl, tempPath, gitCommand, tempPath);
+//			GitUtilities.cloneGitRepositoryUnix(projectUrl, tempPath, gitCommand, tempPath);
 			GitSzz.restore(repoPath, gitCommand, tempPath, branchName);
 			GitUtilities.getLogFromGitRepository(repoPath, gitCommand, repoPath + logFilePath, tempPath);
 			
