@@ -37,7 +37,7 @@ public class JiraMining {
 			    tempJiraIssues = new Vector<IssueBean>();
 			    tempJiraIssues = (Vector)jiraIssues.clone();
 			    allIssues.addAll(jiraIssues);
-				jiraIssues = Jira.getIssuesFromJiraIssueTracker("https://issues.apache.org/jira/", "IO", "BUG", "RESOLVED", null, null, lastCommitDateString);
+				jiraIssues = Jira.getIssuesFromJiraIssueTracker(jiraAddress, projectName, "BUG", "RESOLVED", null, null, lastCommitDateString);
 				//System.out.println("End of loop, size is: " + jiraIssues.size());
 			}
 		    allIssues.addAll(jiraIssues);

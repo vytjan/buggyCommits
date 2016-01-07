@@ -34,7 +34,11 @@ public class Test {
 	public static void main(String[] args) throws Exception {
 		
 		//dynamic one
-		String repoPath = "/home/vytautas/Desktop/commons-io";
+//		String repoPath = "/home/vytautas/Desktop/commons-io";
+//		String repoPath = "/home/vytautas/Desktop/ant-ivy";
+//		String repoPath = "/home/vytautas/Desktop/activemq-apollo";
+//		String repoPath = "/home/vytautas/Desktop/any23";
+		String repoPath = "/home/vytautas/Desktop/ddlutils";
 		
 		String gitCommand = "/usr/bin/git";
 		String tempPath = "/home/vytautas/Desktop/";
@@ -44,23 +48,35 @@ public class Test {
 		String blamePath = "/blame.txt";
 		String logFilePath = "/log.txt";
 		String revisionPath = "/revlist.txt";
+		String branchName = "master";
+//		String branchName = "trunk";
 		
 		//final csv path
 		String finalPath = "/commits.csv";
 		
 		//jira stuff
 		String jiraUrl = "https://issues.apache.org/jira/";
-		String jiraProject = "IO";
+//		String jiraProject = "IO";
+//		String jiraProject = "IVY";
+//		String jiraProject = "AMQ";
+//		String jiraProject = "AMQ";
+//		String jiraProject = "ANY23"; not this, smth wrong with it
+		String jiraProject = "DDLUTILS";
 		String issueType = "BUG";
 		String issueStatus = "RESOLVED";
 		
+		
 		//url's of projects
-		String projectUrl = "https://github.com/apache/commons-io.git";
+//		String projectUrl = "https://github.com/apache/commons-io.git";
+//		String projectUrl = "https://github.com/apache/ant-ivy.git";
+//		String projectUrl = "https://github.com/apache/activemq-apollo.git";
+//		String projectUrl = "https://github.com/apache/any23.git";
+		String projectUrl = "https://github.com/apache/ddlutils.git";
 		
 		try {
 			
-			//GitUtilities.cloneGitRepositoryUnix(projectUrl, tempPath, gitCommand, tempPath);
-			GitSzz.restore(repoPath, gitCommand, tempPath);
+			GitUtilities.cloneGitRepositoryUnix(projectUrl, tempPath, gitCommand, tempPath);
+			GitSzz.restore(repoPath, gitCommand, tempPath, branchName);
 			GitUtilities.getLogFromGitRepository(repoPath, gitCommand, repoPath + logFilePath, tempPath);
 			
 			//get full log of commits
@@ -108,7 +124,7 @@ public class Test {
 				
 //				System.out.println(singleCommitId + " if is duplicated");
 				//Get diff for every commit
-				GitSzz.getDiffBuggy(repoPath, gitCommand, repoPath + diffPath, tempPath, singleCommitId);
+				GitSzz.getDiffBuggy(repoPath, gitCommand, repoPath + diffPath, tempPath, singleCommitId, branchName);
 				
 //				//Parse every diff command from diff.txt file
 				Vector<DiffBean> diffVector = GitRead.readDiffBuggy(repoPath + diffPath, singleCommitId, singleCommitAuthor, singleCommitDate);

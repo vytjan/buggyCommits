@@ -88,7 +88,7 @@ public class ExtractFiles {
 											}
 											
 //											//get number of developers who modified the same file between these 2 commits
-											int[] devsNumber = DevelopersNumber.noOfDevs(commits, singleCommit2.getCommitId(), singleCommit1.getCommitId(),fileName2, singleCommit2.getAuthor(), revisionPath);
+											int[] devsNumber = DevelopersNumber.noOfDevs(commits, singleCommit2.getCommitId(), singleCommit1.getCommitId(),fileName2, singleCommit2.getAuthor(), revisionPath, repoPath);
 											singleFinal.setNoOfDevs(devsNumber[1]);
 											singleFinal.setCommits(devsNumber[0]);
 											

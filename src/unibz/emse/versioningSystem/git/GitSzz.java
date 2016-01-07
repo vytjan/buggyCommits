@@ -162,7 +162,7 @@ public class GitSzz {
 	}
 	
 	public static void getDiffBuggy(String repositoryLocalPath,
-			String gitCommand, String outputPath, String tmpFolder, String commitAfter) throws IOException, InterruptedException {
+			String gitCommand, String outputPath, String tmpFolder, String commitAfter, String branchName) throws IOException, InterruptedException {
 			//[START] Create a temporary file where we write the commands
 				//that we want to execute from command line
 				File commandsToExecute = new File(tmpFolder + "/commands.sh");
@@ -172,7 +172,7 @@ public class GitSzz {
 				//[START] We print the command that we want to execute
 				PrintWriter pw = new PrintWriter(commandsToExecute);
 				pw.println("cd " + repositoryLocalPath);
-				pw.println(gitCommand + " name-rev --name-only HEAD" + " > " + mainBranch);
+				pw.println(gitCommand + " name-rev --name-only HEAD" + " > " + branchName);
 				pw.println(gitCommand + " diff " + commitAfter + "^ " + commitAfter + " > " + outputPath);
 				pw.close();
 				//[END]
@@ -292,7 +292,7 @@ public class GitSzz {
 	
 	
 	public static void restore(String repositoryLocalPath,
-			String gitCommand, String tmpFolder) throws IOException, InterruptedException {
+			String gitCommand, String tmpFolder, String branchName) throws IOException, InterruptedException {
 			//[START] Create a temporary file where we write the commands
 				//that we want to execute from command line
 				File commandsToExecute = new File(tmpFolder + "/commands.sh");
@@ -302,7 +302,7 @@ public class GitSzz {
 				//[START] We print the command that we want to execute
 				PrintWriter pw = new PrintWriter(commandsToExecute);
 				pw.println("cd " + repositoryLocalPath);
-				pw.println(gitCommand + " checkout " + mainBranch);
+				pw.println(gitCommand + " checkout " + branchName);
 				
 				pw.close();
 				//[END]

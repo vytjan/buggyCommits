@@ -82,13 +82,13 @@ public class DevelopersNumber {
 	}
 	
 	
-	public static int[] noOfDevs(Vector<CommitBean> commits, String commitAfter, String commitBefore, String fileName, String author, String logFilePath) throws IOException, InterruptedException{
+	public static int[] noOfDevs(Vector<CommitBean> commits, String commitAfter, String commitBefore, String fileName, String author, String logFilePath, String repoPath) throws IOException, InterruptedException{
 		int[] anArray;
 		anArray = new int[2];
 		HashSet<String> devsArray = new HashSet<String>();
 		
 		Integer numberCommits;
-		String repositoryPath = "/home/vytautas/Desktop/commons-io";
+		String repositoryPath = repoPath;
 		String gitCommand = "/usr/bin/git";
 		String outputPath = logFilePath;
 		String tmpFolder = "/home/vytautas/Desktop/";
